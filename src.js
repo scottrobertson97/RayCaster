@@ -7,9 +7,9 @@ let lastTime = 0; // used by calculateDeltaTime()
 let dt = 0;
 
 let entities = [];
-entities.push(new Entity(200, 300, 11.5, 'https://i.imgur.com/FcIXhVp.png'));
-entities.push(new Entity(600, 450, 11.5, 'https://i.imgur.com/FcIXhVp.png'));
-entities.push(new Entity(200, 700, 11.5, 'https://i.imgur.com/FcIXhVp.png'));
+entities.push(new Enemy(200, 300, 11.5, 'https://i.imgur.com/FcIXhVp.png'));
+entities.push(new Enemy(600, 450, 11.5, 'https://i.imgur.com/FcIXhVp.png'));
+entities.push(new Enemy(200, 700, 11.5, 'https://i.imgur.com/FcIXhVp.png'));
 entities.push(new Entity(600, 700, 11.5, 'https://i.imgur.com/FcIXhVp.png'));
 
 //#region canvas
@@ -104,6 +104,7 @@ function update() {
 	updateEntites();
 	draw();
 	requestAnimationFrame(update);
+	myKeys.previousKeydown = new Array(myKeys.keydown);
 }
 
 function draw() {

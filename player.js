@@ -71,6 +71,9 @@ class Player {
 				} 
 			}	
 		}
+		if(kb.keydown[Keyboard.KEYBOARD.KEY_SPACE] && !kb.previousKeydown[Keyboard.KEYBOARD.KEY_SPACE]){
+			entities.push(new Bullet(this.x, this.y, 5, 'https://i.imgur.com/9B4zVom.png'));
+		}
 	}
 
 	draw(ctx) {
