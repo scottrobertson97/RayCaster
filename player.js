@@ -1,5 +1,5 @@
 class Player {
-	constructor(x = 0, y = 0, a = 0, speed = 200, lookSpeed = 1) {
+	constructor(x = 0, y = 0, a = 0, speed = 200, lookSpeed = 2) {
 		this.x = x;
 		this.y = y;
 		this.a = a;
@@ -13,13 +13,13 @@ class Player {
 	update(dt, kb, map) {
 		if(kb.keydown[Keyboard.KEYBOARD.KEY_RIGHT] || kb.keydown[Keyboard.KEYBOARD.KEY_D]){
 			this.a += this.lookSpeed * dt;
-			if(this.a > TAU ) this.a -= TAU;
+			if(this.a > Math.PI*2 ) this.a -= Math.PI*2;
 			this.dx = Math.cos(this.a) * this.speed * dt;
 			this.dy = Math.sin(this.a) * this.speed * dt;
 		}
 		if(kb.keydown[Keyboard.KEYBOARD.KEY_LEFT] || kb.keydown[Keyboard.KEYBOARD.KEY_A]){
 			this.a -= this.lookSpeed * dt;
-			if(this.a < 0 ) this.a += TAU;
+			if(this.a < 0 ) this.a += Math.PI*2;
 			this.dx = Math.cos(this.a) * this.speed * dt;
 			this.dy = Math.sin(this.a) * this.speed * dt;
 		}
@@ -72,7 +72,7 @@ class Player {
 			}	
 		}
 		if(kb.keydown[Keyboard.KEYBOARD.KEY_SPACE] && !kb.previousKeydown[Keyboard.KEYBOARD.KEY_SPACE]){
-			entities.push(new Bullet(this.x, this.y, 5, 'https://i.imgur.com/9B4zVom.png'));
+			entities.push(new Bullet(this.x, this.y, 5, 'https://i.imgur.com/xrYTZhD.png'));
 		}
 	}
 

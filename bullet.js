@@ -19,4 +19,8 @@ class Bullet extends Entity {
 			entities = entities.filter(e => e != this);
 		}
 	}
+
+	draw(player, ctx, map_ctx, view){
+		super.draw(player, ctx, map_ctx, view, 0.4, 6);
+	}
 }

@@ -23,10 +23,12 @@ class Map extends Array {
 						let yo = y*Map.size;
 						let i = this[y][x];
 		
-						if(i > 0) {
+						if(i > 0 && walls[i]){
 							ctx.drawImage(walls[i], xo, yo, Map.size, Map.size);
-						}
-						else{
+						} else if (i > 0){
+							ctx.fillStyle = 'red';
+							ctx.fillRect(xo+1, yo+1, Map.size-1, Map.size-1);
+						}else{
 							ctx.fillStyle = 'black';
 							ctx.fillRect(xo+1, yo+1, Map.size-1, Map.size-1);
 						}				

@@ -10,18 +10,18 @@ let entities = [];
 entities.push(new Enemy(200, 300, 10, 'https://i.imgur.com/FcIXhVp.png'));
 entities.push(new Enemy(600, 450, 10, 'https://i.imgur.com/FcIXhVp.png'));
 entities.push(new Enemy(200, 700, 10, 'https://i.imgur.com/FcIXhVp.png'));
-entities.push(new Entity(640, 750, 10, 'https://i.imgur.com/FcIXhVp.png'));
+entities.push(new Entity(600, 750, 40, 'https://i.imgur.com/rgwwS0K.png'));
 
 //#region canvas
 const c = document.getElementById("view");
 const ctx = c.getContext("2d");
 const map_c = document.getElementById("map");
 const map_ctx = map_c.getContext("2d");
+//const UI_OFFSET;
 let drawMap = false;
 //#endregion
 
 //#region constants
-const TAU = Math.PI * 2;
 const P2 = Math.PI / 2;
 const P3 = 3 * Math.PI / 2;
 const DR = Math.PI / 180; // one degree in radians
@@ -42,7 +42,7 @@ const view = {
 		return this._halfHeight;
 	}
 };
-let fov = 75;
+let fov = 80;
 let horRes = 8; //horizontal resolution, higher number = less resolution
 let halfHorRes = horRes/2;
 let drawRays = true;
@@ -54,7 +54,7 @@ function updateHorRes(num){
 
 //#region wall texture stuff
 const walls = [];
-const imgSrcs = ['','https://i.imgur.com/W8PJYFY.png','https://i.imgur.com/pRpAqeP.png'];
+const imgSrcs = ['','https://i.imgur.com/7B86fSv.png','https://i.imgur.com/vSDbzMX.png'];
 imgSrcs.forEach((src, i) => {
 	walls[i] = new Image();
 	walls[i].src = src;
@@ -68,9 +68,9 @@ let _m = [
 	[1,0,2,0,0,0,2,0,0,0,2],
 	[1,0,0,0,0,0,0,0,0,0,2],
 	[1,0,0,0,0,0,0,0,0,0,2],
-	[1,0,0,0,0,2,0,0,0,0,2],
+	[1,0,0,0,0,3,0,0,0,0,2],
 	[1,0,0,0,0,0,0,0,0,0,2],
-	[1,0,2,0,0,2,1,0,0,0,2],
+	[1,0,2,0,0,3,1,0,0,0,2],
 	[1,0,2,0,0,0,1,0,0,0,2],
 	[1,0,0,0,0,0,0,0,0,0,2],
 	[1,0,0,0,0,0,0,0,0,0,2],
@@ -114,6 +114,7 @@ function draw() {
 	drawRays2D();
 	player.draw(map_ctx);
 	drawEntites();
+	drawUI();
 }
 
 function updateEntites(){
@@ -126,10 +127,12 @@ function drawEntites(){
 
 function drawRays2D() {
 	ctx.fillStyle = '#333';
-	ctx.fillRect(0,0,view.width,view.halfHeight);
+	//ctx.fillRect(0,0,view.width,view.halfHeight);
+	ctx.fillRect(0,0,view.width,225);
 	ctx.fillStyle = 'gray';
-	ctx.fillRect(0,view.halfHeight,view.width,view.halfHeight);
-
+	//ctx.fillRect(0,view.halfHeight,view.width,view.halfHeight);
+	ctx.fillRect(0,225,view.width,225);
+	
 	let colorMod = 1;
 
 	let rays = [];
@@ -140,9 +143,9 @@ function drawRays2D() {
 
 	ray.a = player.a - DR*(fov/2);
 	if(ray.a < 0)
-		ray.a += TAU;
-	if(ray.a > TAU)
-		ray.a -= TAU;
+		ray.a += Math.PI*2;
+	if(ray.a > Math.PI*2)
+		ray.a -= Math.PI*2;
 
 	entities.forEach(e => e.drawn = false);
 
@@ -301,9 +304,9 @@ function drawRays2D() {
 		//#region  change angle of next ray
 		ray.a += (fov/view.width)*horRes*DR;
 		if(ray.a < 0)
-			ray.a += TAU;
-		if(ray.a > TAU)
-			ray.a -= TAU;
+			ray.a += Math.PI*2;
+		if(ray.a > Math.PI*2)
+			ray.a -= Math.PI*2;
 		//#endregion 
 	}
 
@@ -335,10 +338,7 @@ let a;
 
 function drawRayWall(ray, mp, disT, isVertical, isUp, isLeft, r, colorMod){
 	let ca = player.a - ray.a;
-	if(ca < 0)
-		ca += TAU;
-	if(ca > TAU)
-		ca -= TAU;
+
 	//if(disT > DOF * map.size)
 		//continue;
 
@@ -348,21 +348,15 @@ function drawRayWall(ray, mp, disT, isVertical, isUp, isLeft, r, colorMod){
 	//if(!mp || !lineH || !dof ){
 	//	continue;
 	//}
-	let lineO = view.halfHeight - Math.trunc(lineH/2); //line offset
-	
+	//let lineO = view.halfHeight - Math.trunc(lineH/2);//line offset
+	let lineO = 225 - Math.trunc(lineH/2);
+
 	let x = mp.x;
 	let y = mp.y;
 
 	let imgID = map[y][x];
 
-	/*if(map[y][x] == 1) {
-		ctx.beginPath();
-		ctx.moveTo(r*horRes +  halfHorRes , lineO);
-		ctx.lineTo(r*horRes +  halfHorRes, lineH + lineO);
-		ctx.strokeStyle = `rgb(${Math.min((Math.min(lineH, view.height)/view.height)+0.2, 1) * 200 * colorMod},0,0)`;
-		ctx.lineWidth = horRes;
-		ctx.stroke();
-	} else*/ if(imgID > 0 && walls[imgID] != null) {
+	if(imgID > 0 && walls[imgID] != null) {
 		let percentage;
 		if(!isVertical && isUp){ //bottom face
 			percentage = (ray.x%Map.size) / Map.size;
@@ -382,6 +376,13 @@ function drawRayWall(ray, mp, disT, isVertical, isUp, isLeft, r, colorMod){
 		ctx.fillStyle = 'black';
 		ctx.fillRect(r*horRes, lineO, horRes, lineH);
 		ctx.globalAlpha = 1.0;
+	} else if (imgID > 0) {
+		ctx.beginPath();
+		ctx.moveTo(r*horRes +  halfHorRes , lineO);
+		ctx.lineTo(r*horRes +  halfHorRes, lineH + lineO);
+		ctx.strokeStyle = `rgb(${Math.min((Math.min(lineH, view.height)/view.height)+0.2, 1) * 200 * colorMod},0,0)`;
+		ctx.lineWidth = horRes;
+		ctx.stroke();
 	}
 }
 
@@ -394,4 +395,26 @@ function calculateDeltaTime() {
 
 function changeQualityHandler(e) {
 	updateHorRes(e.target.value);
+}
+
+function drawUI(){
+	ctx.fillStyle='green';
+	ctx.fillRect(0,450,view.width,150);
+	ctx.beginPath();
+	//400,255
+	ctx.moveTo(400, 200);		
+	ctx.lineTo(400, 210);
+
+	ctx.moveTo(400, 240);		
+	ctx.lineTo(400, 250);
+
+	ctx.moveTo(415, 225);		
+	ctx.lineTo(425, 225);
+
+	ctx.moveTo(385, 225);		
+	ctx.lineTo(375, 225);
+
+	ctx.strokeStyle = 'green';
+	ctx.lineWidth = 4;
+	ctx.stroke();
 }
