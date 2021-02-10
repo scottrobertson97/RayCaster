@@ -7,16 +7,17 @@ let lastTime = 0; // used by calculateDeltaTime()
 let dt = 0;
 
 let entities = [];
-entities.push(new Enemy(200, 300, 11.5, 'https://i.imgur.com/FcIXhVp.png'));
-entities.push(new Enemy(600, 450, 11.5, 'https://i.imgur.com/FcIXhVp.png'));
-entities.push(new Enemy(200, 700, 11.5, 'https://i.imgur.com/FcIXhVp.png'));
-entities.push(new Entity(600, 700, 11.5, 'https://i.imgur.com/FcIXhVp.png'));
+entities.push(new Enemy(200, 300, 10, 'https://i.imgur.com/FcIXhVp.png'));
+entities.push(new Enemy(600, 450, 10, 'https://i.imgur.com/FcIXhVp.png'));
+entities.push(new Enemy(200, 700, 10, 'https://i.imgur.com/FcIXhVp.png'));
+entities.push(new Entity(640, 750, 10, 'https://i.imgur.com/FcIXhVp.png'));
 
 //#region canvas
 const c = document.getElementById("view");
 const ctx = c.getContext("2d");
 const map_c = document.getElementById("map");
 const map_ctx = map_c.getContext("2d");
+let drawMap = false;
 //#endregion
 
 //#region constants
@@ -24,6 +25,7 @@ const TAU = Math.PI * 2;
 const P2 = Math.PI / 2;
 const P3 = 3 * Math.PI / 2;
 const DR = Math.PI / 180; // one degree in radians
+const RD = 180 / Math.PI; // on radian in degrees
 const DOF = 64;
 //#endregion
 
@@ -104,7 +106,7 @@ function update() {
 	updateEntites();
 	draw();
 	requestAnimationFrame(update);
-	myKeys.previousKeydown = new Array(myKeys.keydown);
+	myKeys.previousKeydown = myKeys.keydown.slice();
 }
 
 function draw() {
@@ -120,15 +122,6 @@ function updateEntites(){
 
 function drawEntites(){
 	entities.forEach(e => e.draw2D(map_ctx));
-}
-
-function dist( ax, ay, bx, by){	
-	return (Math.sqrt(Math.pow((bx-ax), 2) + Math.pow((by-ay), 2)));
-}
-
-function norm(vec) {
-	let mag = dist(vec.x, vec.y, 0, 0);
-	return {x: vec.x/mag, y: vec.y/mag};
 }
 
 function drawRays2D() {
@@ -280,7 +273,7 @@ function drawRays2D() {
 			};
 			
 			if(!e.drawn && (lineIntersect(rls, els1) || lineIntersect(rls, els2))) {
-				{				
+				if(drawMap){
 					map_ctx.beginPath();
 					map_ctx.moveTo(ray.x, ray.y);
 					map_ctx.lineTo(player.x, player.y);	
@@ -293,7 +286,7 @@ function drawRays2D() {
 		//#endregion
 
 		//#region draw 2d
-		if(drawRays){
+		if(drawRays && drawMap){
 			map_ctx.beginPath();
 			map_ctx.moveTo(player.x, player.y);
 			map_ctx.lineTo(ray.x, ray.y);

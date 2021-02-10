@@ -1,5 +1,5 @@
 class Player {
-	constructor(x = 0, y = 0, a = 0, speed = 200, lookSpeed = 2) {
+	constructor(x = 0, y = 0, a = 0, speed = 200, lookSpeed = 1) {
 		this.x = x;
 		this.y = y;
 		this.a = a;
@@ -77,13 +77,15 @@ class Player {
 	}
 
 	draw(ctx) {
-		ctx.fillStyle = 'yellow';
-		ctx.fillRect(this.x-10, this.y-10, 20, 20);
-		ctx.beginPath();
-		ctx.moveTo(this.x, this.y);
-		ctx.lineTo(this.x + this.dx * 20, this.y + this.dy * 20);
-		ctx.strokeStyle = 'yellow';
-		ctx.lineWidth = 1;
-		ctx.stroke();
+		if(drawMap){
+			ctx.fillStyle = 'yellow';
+			ctx.fillRect(this.x-10, this.y-10, 20, 20);
+			ctx.beginPath();
+			ctx.moveTo(this.x, this.y);
+			ctx.lineTo(this.x + this.dx * 20, this.y + this.dy * 20);
+			ctx.strokeStyle = 'yellow';
+			ctx.lineWidth = 1;
+			ctx.stroke();
+		}
 	}
 }

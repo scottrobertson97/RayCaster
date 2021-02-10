@@ -46,3 +46,12 @@ function lineSegmentTouchesOrCrossesLine(a, b) {
 		(( r1 && !r2 ) || ( !r1 && r2 ))
 	);
 }
+
+function dist( ax, ay, bx, by){	
+	return (Math.sqrt(Math.pow((bx-ax), 2) + Math.pow((by-ay), 2)));
+}
+
+function norm(vec) {
+	let mag = dist(vec.x, vec.y, 0, 0);
+	return {x: vec.x/mag, y: vec.y/mag};
+}

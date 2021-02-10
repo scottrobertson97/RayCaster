@@ -1,11 +1,8 @@
 <!doctype html>
 <html>
 	<head></head>
-	<body>
-		<canvas id="map" style="float: left;margin-right: 10px;"></canvas>
+	<body>		
 		<canvas id="view" width="800" height="600" style="float: left;"></canvas>
-		<canvas id="imageCanvas" width="16" height="16" style="display: none;"></canvas>
-
 		<div style="float: left;margin-left: 20px;">
 			<h2 style="margin-bottom: 10px;">Quality</h2>
 			
@@ -24,8 +21,15 @@
 			<div>
 				<input type="radio" id="low" name="quality" value="16">
 				<label for="low">Low</label>	
-			</div>		
-		</div>		
+			</div>	
+			<br /> <br />
+			<button onclick="toggleMap()">Toggle 2D map</button>
+		</div>	
+
+		<canvas id="map" style="float: left;margin-right: 10px;display: none;"></canvas>
+		<canvas id="imageCanvas" width="16" height="16" style="display: none;"></canvas>
+
+			
 		<script src="helper.js"></script>
 		<script src="keyboard.js"></script>
 		<script src="map.js"></script>
@@ -34,5 +38,11 @@
 		<script src="enemy.js"></script>
 		<script src="bullet.js"></script>
 		<script src="src.js"></script>
+		<script>
+			function toggleMap(){
+				drawMap = !drawMap;
+				document.getElementById("map").style.display = drawMap ? "block" : "none";
+			}
+		</script>
 	</body>
 </html>

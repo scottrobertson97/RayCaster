@@ -3,7 +3,7 @@ class Enemy extends Entity {
 		super(x, y, size, src);
 	}
 
-	update(player, norm){
+	update(player){
 		let vecToPlayer = {x: player.x - this.x, y: player.y - this.y};
 		let direction = norm(vecToPlayer);	
 

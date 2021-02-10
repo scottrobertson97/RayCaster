@@ -6,3 +6,6 @@ enemy class
 sprite class?
 ai movement
 implement vector class
+diffrent sprite from diiferent angle
+animations
+add more bullet stuff
