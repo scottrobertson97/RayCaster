@@ -1,11 +1,5 @@
-map can be toggled
 load map from file
 image tiling on block
-enemy class
-sprite class?
 ai movement
 diffrent sprite from diiferent angle
-animations
-add more bullet stuff
 doors
-entity width and height adjustments
