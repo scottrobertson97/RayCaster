@@ -33,7 +33,8 @@ const P2 = Math.PI / 2;
 const P3 = (3 * Math.PI) / 2;
 const DR = Math.PI / 180; // one degree in radians
 const RD = 180 / Math.PI; // on radian in degrees
-const DOF = 64;
+const DOF = 100;
+const FOG = 6 * Map.size;
 //#endregion
 
 //#region view
@@ -117,8 +118,8 @@ function update() {
   player.update(dt, myKeys, map);
   updateEntites();
   draw(dt);
-  requestAnimationFrame(update);
   myKeys.previousKeydown = myKeys.keydown.slice();
+  requestAnimationFrame(update);
 }
 
 function draw(dt) {
@@ -178,6 +179,8 @@ function drawRays2D(dt) {
     let isVertical, isLeft, isUp;
     let mpv = { x: 1, y: 0 };
     let mph = { x: 0, y: 0 };
+    let hit = false;
+    let rayColor = "red";
     //#endregion
 
     //#region ---horizontal line check---
@@ -227,6 +230,7 @@ function drawRays2D(dt) {
         disH = dist(player.x, player.y, hx, hy);
         mph.x = mx;
         mph.y = my;
+        hit = true;
         //mph = mp;
         dof = DOF;
       } else {
@@ -283,6 +287,7 @@ function drawRays2D(dt) {
         disV = dist(player.x, player.y, vx, vy);
         mpv.x = mx;
         mpv.y = my;
+        hit = true;
         dof = DOF;
       } else {
         ray.x += xo;
@@ -294,14 +299,15 @@ function drawRays2D(dt) {
 
     //#region  vertical or horizontal
     if (disV <= disH) {
+      //vertical
       ray.x = vx;
       ray.y = vy;
       disT = disV;
       isVertical = true;
       colorMod = 1;
       mp = mpv;
-    }
-    if (disH < disV) {
+    } else {
+      //horizontal
       ray.x = hx;
       ray.y = hy;
       disT = disH;
@@ -340,12 +346,24 @@ function drawRays2D(dt) {
     });
     //#endregion
 
+    //#region calculate fog
+    let _mp = { x: mp.x, y: mp.y };
+    if (disT > FOG || !hit) {
+      //if it hit nothing draw the fog
+      const rayNorm = norm({ x: ray.x - player.x, y: ray.y - player.y });
+      ray.x = player.x + rayNorm.x * FOG;
+      ray.y = player.y + rayNorm.y * FOG;
+      disT = FOG;
+      _mp = null;
+    }
+    //#endregion
+
     //#region draw 2d
-    if (drawRays && drawMap) {
+    if (drawRays && drawMap && hit) {
       map_ctx.beginPath();
       map_ctx.moveTo(player.x, player.y);
       map_ctx.lineTo(ray.x, ray.y);
-      map_ctx.strokeStyle = "red";
+      map_ctx.strokeStyle = rayColor;
       map_ctx.lineWidth = 1;
       map_ctx.stroke();
     }
@@ -353,7 +371,7 @@ function drawRays2D(dt) {
 
     rays.push({
       ray: { x: ray.x, y: ray.y, a: ray.a },
-      mp: { x: mp.x, y: mp.y },
+      mp: _mp,
       disT,
       isVertical,
       isUp,
@@ -362,7 +380,7 @@ function drawRays2D(dt) {
       colorMod,
     });
 
-    //#region  change angle of next ray
+    //#region change angle of next ray
     ray.a += (fov / view.width) * horRes * DR;
     if (ray.a < 0) ray.a += Math.PI * 2;
     if (ray.a > Math.PI * 2) ray.a -= Math.PI * 2;
@@ -419,11 +437,20 @@ function drawRayWall(ray, mp, disT, isVertical, isUp, isLeft, r, colorMod) {
   //let lineO = view.halfHeight - Math.trunc(lineH/2);//line offset
   let lineO = 225 - Math.trunc(lineH / 2);
 
+  if (!mp) {
+    ctx.beginPath();
+    ctx.moveTo(r * horRes + halfHorRes, lineO);
+    ctx.lineTo(r * horRes + halfHorRes, lineH + lineO);
+    ctx.strokeStyle = `#010101`;
+    console.log(colorMod);
+    ctx.lineWidth = horRes;
+    ctx.stroke();
+    return;
+  }
+
   let x = mp.x;
   let y = mp.y;
-
   let imgID = map[y][x];
-
   if (imgID > 0 && walls[imgID] != null) {
     let percentage;
     if (!isVertical && isUp) {
@@ -510,4 +537,5 @@ function drawUI() {
   ctx.font = "30px Arial";
   ctx.fillText("WASD or Arrow Keys to move", 10, 485);
   ctx.fillText("SPACE to shoot", 10, 520);
+  ctx.fillText(`${Math.trunc(1 / dt)} fps`, 10, 555);
 }
