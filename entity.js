@@ -3,20 +3,28 @@ class Entity {
     this.x = x;
     this.y = y;
     this.size = size;
-    this.drwan = false;
+    this.drawn = false;
+    let that = this;
     if (Array.isArray(src)) {
       this.imgs = [];
+      this.imgRatios = [];
       this.frameIndex = 0;
       this.frameRate = frameRate;
       this.frameTick = 0;
       for (const srcURL of src) {
         let img = new Image();
+        img.onload = () => {
+          that.imgRatios.push(img.width / img.height);
+        };
         img.src = srcURL;
         img.setAttribute("crossOrigin", "");
         this.imgs.push(img);
       }
     } else {
       this.img = new Image();
+      this.img.onload = () => {
+        that.imgRatio = that.img.width / that.img.height;
+      };
       this.img.src = src;
       this.img.setAttribute("crossOrigin", "");
     }
@@ -34,6 +42,10 @@ class Entity {
   }
 
   draw(dt, player, ctx, map_ctx, view, _height = 1, _width = 1) {
+    if (!this.imgRatio && !this.imgRatios) {
+      this.imgRatio = this.img.width / this.img.height;
+    }
+
     let disT = dist(player.x, player.y, this.x, this.y);
 
     let minT = player.a - (fov / 2) * (Math.PI / 180);
@@ -59,20 +71,9 @@ class Entity {
       this.drawTracerLine(map_ctx, player);
     }
     //#endregion
-
-    if (this?.img?.src == "https://i.imgur.com/xrYTZhD.png")
-      console.log(this.img.height);
-    let imageHeight = this.img
-      ? this.img.height
-      : this.imgs[this.frameIndex].height;
-    let imageWidth = this.img
-      ? this.img.width
-      : this.imgs[this.frameIndex].width;
-    let width = lineH * (imageWidth / imageHeight);
-    // let width =
-    //   (lineH / imageHeight) * this.size * 2 * _width; /*this.img.width*/
+    let _imgRatio = this.img ? this.imgRatio : this.imgRatios[this.frameIndex];
+    let width = lineH * _imgRatio;
     let percent = (t - minT) / (maxT - minT);
-    //console.log(percent);
     if (minT < 0 && t > player.a + Math.PI) {
       percent = (t - minT - Math.PI * 2) / (maxT - minT);
     } else if (maxT > Math.PI * 2 && t < player.a - Math.PI) {
