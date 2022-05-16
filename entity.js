@@ -65,7 +65,7 @@ class Entity {
     //let relativeEntityHeight = this.size/10;
     let lineH = Math.trunc((Map.size * view.height * _height) / disT); //height of drawn image
     //let lineO = view.halfHeight - Math.trunc(lineH/2); //offset off of y of image
-    let lineO = 225 - Math.trunc(lineH / 2);
+    let lineO = view.halfHeight * 0.75 - Math.trunc(lineH / 2);
     //#region draw lines
     if (drawMap) {
       this.drawTracerLine(map_ctx, player);

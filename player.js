@@ -1,88 +1,62 @@
 class Player {
   constructor(x = 0, y = 0, a = 0, speed = 200, lookSpeed = 2) {
-    this.x = x;
-    this.y = y;
+    this.pos = new Vec2({ x, y });
     this.a = a;
     this.speed = speed;
     this.lookSpeed = lookSpeed;
     this.ctx = ctx;
-    this.dx = Math.cos(this.a) * this.speed * 0.016;
-    this.dy = Math.sin(this.a) * this.speed * 0.016;
+    this.dx = Math.cos(this.a) * this.speed * (1 / 60);
+    this.dy = Math.sin(this.a) * this.speed * (1 / 60);
+  }
+
+  get x() {
+    return this.pos.x;
+  }
+  get y() {
+    return this.pos.y;
+  }
+  set x(val) {
+    this.pos.x = val;
+  }
+  set y(val) {
+    this.pos.y = val;
   }
 
   update(dt, kb, map) {
+    this.turn(dt, kb);
+    this.move(dt, kb, map);
+    this.shoot(kb);
+  }
+
+  turn(dt, kb) {
+    let d = kb.turn();
+    if (!d) return;
+    this.a += this.lookSpeed * dt * d;
+    if (this.a > Math.PI * 2) this.a -= Math.PI * 2;
+    if (this.a < 0) this.a += Math.PI * 2;
+  }
+
+  move(dt, kb, map) {
+    let d = kb.move();
+    this.dx = Math.cos(this.a) * this.speed * dt;
+    this.dy = Math.sin(this.a) * this.speed * dt;
+    if (!d) return;
+    let oldX = Math.trunc(this.x) >> 6;
+    let oldY = Math.trunc(this.y) >> 6;
+    let newX = Math.trunc(this.x + this.dx * d) >> 6;
+    let newY = Math.trunc(this.y + this.dy * d) >> 6;
     if (
-      kb.keydown[Keyboard.KEYBOARD.KEY_RIGHT] ||
-      kb.keydown[Keyboard.KEYBOARD.KEY_D]
-    ) {
-      this.a += this.lookSpeed * dt;
-      if (this.a > Math.PI * 2) this.a -= Math.PI * 2;
-      this.dx = Math.cos(this.a) * this.speed * dt;
-      this.dy = Math.sin(this.a) * this.speed * dt;
-    }
-    if (
-      kb.keydown[Keyboard.KEYBOARD.KEY_LEFT] ||
-      kb.keydown[Keyboard.KEYBOARD.KEY_A]
-    ) {
-      this.a -= this.lookSpeed * dt;
-      if (this.a < 0) this.a += Math.PI * 2;
-      this.dx = Math.cos(this.a) * this.speed * dt;
-      this.dy = Math.sin(this.a) * this.speed * dt;
-    }
-    if (
-      kb.keydown[Keyboard.KEYBOARD.KEY_UP] ||
-      kb.keydown[Keyboard.KEYBOARD.KEY_W]
-    ) {
-      let oldX = Math.trunc(this.x) >> 6;
-      let oldY = Math.trunc(this.y) >> 6;
-      this.x += this.dx;
-      this.y += this.dy;
-      let newX = Math.trunc(this.x) >> 6;
-      let newY = Math.trunc(this.y) >> 6;
-      if (map[newY][newX] > 0) {
-        if (newX != oldX) {
-          this.x -= this.dx;
-        }
-        if (newY != oldY) {
-          this.y -= this.dy;
-        }
-        if (newX != oldX && newY != oldY) {
-          if (map[oldY][newX] == 0) {
-            this.x += this.dx;
-          }
-          if (map[newY][oldX] == 0) {
-            this.y += this.dy;
-          }
-        }
-      }
-    }
-    if (
-      kb.keydown[Keyboard.KEYBOARD.KEY_DOWN] ||
-      kb.keydown[Keyboard.KEYBOARD.KEY_S]
-    ) {
-      let oldX = Math.trunc(this.x) >> 6;
-      let oldY = Math.trunc(this.y) >> 6;
-      this.x -= this.dx;
-      this.y -= this.dy;
-      let newX = Math.trunc(this.x) >> 6;
-      let newY = Math.trunc(this.y) >> 6;
-      if (map[newY][newX] > 0) {
-        if (newX != oldX) {
-          this.x += this.dx;
-        }
-        if (newY != oldY) {
-          this.y += this.dy;
-        }
-        if (newX != oldX && newY != oldY) {
-          if (map[oldY][newX] == 0) {
-            this.x -= this.dx;
-          }
-          if (map[newY][oldX] == 0) {
-            this.y -= this.dy;
-          }
-        }
-      }
-    }
+      !map[newY][newX] || // new square is not a wall (will clip around corners)
+      newX == oldX || // havent moved into a new square left or right
+      (newY != oldY && !map[oldY][newX]) // moved  diagonally but not abstructed left or right
+    )
+      this.x = this.x + this.dx * d;
+
+    if (!map[newY][newX] || newY == oldY || (newX != oldX && !map[newY][oldX]))
+      this.y = this.y + this.dy * d;
+  }
+
+  shoot(kb) {
     if (
       kb.keydown[Keyboard.KEYBOARD.KEY_SPACE] &&
       !kb.previousKeydown[Keyboard.KEYBOARD.KEY_SPACE]
@@ -93,7 +67,7 @@ class Player {
     }
   }
 
-  draw(ctx) {
+  draw2D(ctx) {
     if (drawMap) {
       ctx.fillStyle = "yellow";
       ctx.fillRect(this.x - 10, this.y - 10, 20, 20);

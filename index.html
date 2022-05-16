@@ -24,6 +24,7 @@
       <br />
       <br />
       <button onclick="toggleMap()">Toggle 2D map</button>
+      <!-- <button onclick="toggleFog()">Toggle fog</button> -->
     </div>
 
     <canvas
@@ -37,6 +38,7 @@
       style="display: none"
     ></canvas>
 
+    <script src="vec2.js"></script>
     <script src="helper.js"></script>
     <script src="keyboard.js"></script>
     <script src="map.js"></script>
@@ -51,6 +53,9 @@
         document.getElementById("map").style.display = drawMap
           ? "block"
           : "none";
+      }
+      function toggleFog() {
+        fogEnabled = !fogEnabled;
       }
     </script>
   </body>

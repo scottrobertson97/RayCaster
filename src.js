@@ -26,6 +26,7 @@ const map_c = document.getElementById("map");
 const map_ctx = map_c.getContext("2d");
 //const UI_OFFSET;
 let drawMap = false;
+let fogEnabled = false;
 //#endregion
 
 //#region constants
@@ -34,7 +35,7 @@ const P3 = (3 * Math.PI) / 2;
 const DR = Math.PI / 180; // one degree in radians
 const RD = 180 / Math.PI; // on radian in degrees
 const DOF = 100;
-const FOG = 6 * Map.size;
+const FOG = { START: 3 * Map.size, END: 9 * Map.size };
 //#endregion
 
 //#region view
@@ -50,7 +51,7 @@ const view = {
     return this._halfHeight;
   },
 };
-let fov = 80;
+let fov = 90;
 let horRes = 8; //horizontal resolution, higher number = less resolution
 let halfHorRes = horRes / 2;
 let drawRays = true;
@@ -75,20 +76,20 @@ imgSrcs.forEach((src, i) => {
 //#endregion
 
 let _m = [
-  [1, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1],
-  [1, 0, 2, 0, 0, 2, 1, 0, 0, 0, 2],
-  [1, 0, 2, 0, 0, 0, 2, 0, 0, 0, 2],
-  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-  [1, 0, 0, 0, 0, 3, 0, 0, 0, 0, 2],
-  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-  [1, 0, 2, 0, 0, 3, 1, 0, 0, 0, 2],
-  [1, 0, 2, 0, 0, 0, 1, 0, 0, 0, 2],
-  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-  [1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 2],
-  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 2, 2, 2, 2, 1, 1, 1, 1, 1, 2, 2, 1],
+  [1, 0, 2, 0, 0, 2, 1, 0, 0, 0, 0, 2, 2],
+  [1, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 2, 2],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+  [1, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 2],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+  [1, 0, 2, 0, 0, 3, 1, 0, 0, 0, 0, 2, 2],
+  [1, 0, 2, 0, 0, 0, 1, 0, 0, 0, 0, 2, 2],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+  [1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ];
 
 const map = new Map(_m);
@@ -125,7 +126,7 @@ function update() {
 function draw(dt) {
   map.draw(map_ctx, map_c);
   drawRays2D(dt);
-  player.draw(map_ctx);
+  player.draw2D(map_ctx);
   drawEntites();
   drawUI();
 }
@@ -153,12 +154,19 @@ function drawEntites() {
 }
 
 function drawRays2D(dt) {
-  ctx.fillStyle = "#333";
-  //ctx.fillRect(0,0,view.width,view.halfHeight);
-  ctx.fillRect(0, 0, view.width, 225);
-  ctx.fillStyle = "gray";
-  //ctx.fillRect(0,view.halfHeight,view.width,view.halfHeight);
-  ctx.fillRect(0, 225, view.width, 225);
+  let grd = ctx.createLinearGradient(0, 0, 0, view.height * 0.75);
+  grd.addColorStop(0, "#555");
+  grd.addColorStop(0.4, "#222");
+  grd.addColorStop(0.5, "#222");
+  grd.addColorStop(0.5, "#555");
+  grd.addColorStop(0.6, "#555");
+  grd.addColorStop(1, "#888");
+
+  ctx.fillStyle = grd;
+  ctx.fillRect(0, 0, view.width, view.height * 0.75);
+  // ctx.fillRect(0, 0, view.width, view.halfHeight * 0.75);
+  // ctx.fillStyle = "gray";
+  // ctx.fillRect(0, view.halfHeight * 0.75, view.width, view.halfHeight * 0.75);
 
   let colorMod = 1;
 
@@ -193,7 +201,7 @@ function drawRays2D(dt) {
     let aTan = -1 / Math.tan(ray.a);
     if (ray.a > Math.PI) {
       //looking up
-      ray.y = ((Math.trunc(player.y) >> 6) << 6) - 0.0001;
+      ray.y = roundToWorld(player.y) - 0.0001;
       ray.x = (player.y - ray.y) * aTan + player.x;
       yo = -Map.size;
       xo = -yo * aTan;
@@ -201,7 +209,7 @@ function drawRays2D(dt) {
     }
     if (ray.a < Math.PI) {
       //looking down
-      ray.y = ((Math.trunc(player.y) >> 6) << 6) + Map.size;
+      ray.y = roundToWorld(player.y) + Map.size;
       ray.x = (player.y - ray.y) * aTan + player.x;
       yo = Map.size;
       xo = -yo * aTan;
@@ -214,8 +222,8 @@ function drawRays2D(dt) {
       dof = DOF;
     }
     while (dof < DOF) {
-      mx = Math.trunc(ray.x) >> 6;
-      my = Math.trunc(ray.y) >> 6;
+      mx = roundToMap(ray.x);
+      my = roundToMap(ray.y);
       //mp = my * map.width + mx;
       if (
         mx < map.width &&
@@ -251,7 +259,7 @@ function drawRays2D(dt) {
     let nTan = -Math.tan(ray.a);
     if (ray.a > P2 && ray.a < P3) {
       //looking left
-      ray.x = ((Math.trunc(player.x) >> 6) << 6) - 0.0001;
+      ray.x = roundToWorld(player.x) - 0.0001;
       ray.y = (player.x - ray.x) * nTan + player.y;
       xo = -Map.size;
       yo = -xo * nTan;
@@ -259,7 +267,7 @@ function drawRays2D(dt) {
     }
     if (ray.a < P2 || ray.a > P3) {
       //looking right
-      ray.x = ((Math.trunc(player.x) >> 6) << 6) + Map.size;
+      ray.x = roundToWorld(player.x) + Map.size;
       ray.y = (player.x - ray.x) * nTan + player.y;
       xo = Map.size;
       yo = -xo * nTan;
@@ -272,8 +280,8 @@ function drawRays2D(dt) {
       dof = DOF;
     }
     while (dof < DOF) {
-      mx = Math.trunc(ray.x) >> 6;
-      my = Math.trunc(ray.y) >> 6;
+      mx = roundToMap(ray.x);
+      my = roundToMap(ray.y);
       if (
         mx >= 0 &&
         my >= 0 &&
@@ -312,7 +320,7 @@ function drawRays2D(dt) {
       ray.y = hy;
       disT = disH;
       isVertical = false;
-      colorMod = 0.7;
+      colorMod = 0.65;
       mp = mph;
     }
     //#endregion
@@ -348,13 +356,14 @@ function drawRays2D(dt) {
 
     //#region calculate fog
     let _mp = { x: mp.x, y: mp.y };
-    if (disT > FOG || !hit) {
+    if (fogEnabled && (disT > FOG.END || !hit)) {
       //if it hit nothing draw the fog
       const rayNorm = norm({ x: ray.x - player.x, y: ray.y - player.y });
-      ray.x = player.x + rayNorm.x * FOG;
-      ray.y = player.y + rayNorm.y * FOG;
-      disT = FOG;
+      ray.x = player.x + rayNorm.x * FOG.END;
+      ray.y = player.y + rayNorm.y * FOG.END;
+      disT = FOG.END;
       _mp = null;
+      colorMod = 0;
     }
     //#endregion
 
@@ -419,6 +428,7 @@ function drawRays2D(dt) {
 
   //#endregion
 }
+
 let _rays;
 let a;
 
@@ -429,20 +439,19 @@ function drawRayWall(ray, mp, disT, isVertical, isUp, isLeft, r, colorMod) {
   //continue;
 
   disT *= Math.cos(ca); //fix fisheye
-  let lineH = Math.trunc((Map.size * view.height) / disT); //line height
+  let lineH = Math.trunc((Map.size * view.height * 0.75) / disT); //line height
 
   //if(!mp || !lineH || !dof ){
   //	continue;
   //}
   //let lineO = view.halfHeight - Math.trunc(lineH/2);//line offset
-  let lineO = 225 - Math.trunc(lineH / 2);
+  let lineO = (view.height * 0.75) / 2 - Math.trunc(lineH / 2);
 
   if (!mp) {
     ctx.beginPath();
     ctx.moveTo(r * horRes + halfHorRes, lineO);
     ctx.lineTo(r * horRes + halfHorRes, lineH + lineO);
-    ctx.strokeStyle = `#010101`;
-    console.log(colorMod);
+    ctx.strokeStyle = `white`;
     ctx.lineWidth = horRes;
     ctx.stroke();
     return;
@@ -484,13 +493,23 @@ function drawRayWall(ray, mp, disT, isVertical, isUp, isLeft, r, colorMod) {
     ctx.globalAlpha =
       1 -
       Math.min(Math.min(lineH, view.height) / view.height + 0.3, 1) * colorMod;
+    // ctx.globalAlpha = 1 - colorMod;
     ctx.fillStyle = "black";
     ctx.fillRect(r * horRes, lineO, horRes, lineH);
+    // if (fogEnabled) {
+    //   let ratio = (disT - FOG.START) / (FOG.END - FOG.START);
+    //   if (ratio > 1) ratio = 1;
+    //   if (ratio < 0) ratio = 0;
+    //   ctx.globalAlpha = ratio;
+    //   ctx.fillStyle = "white";
+    //   ctx.fillRect(r * horRes, lineO, horRes, lineH);
+    // }
     ctx.globalAlpha = 1.0;
   } else if (imgID > 0) {
     ctx.beginPath();
     ctx.moveTo(r * horRes + halfHorRes, lineO);
     ctx.lineTo(r * horRes + halfHorRes, lineH + lineO);
+    ctx.strokeStyle = "red";
     ctx.strokeStyle = `rgb(${
       Math.min(Math.min(lineH, view.height) / view.height + 0.2, 1) *
       200 *
@@ -498,6 +517,19 @@ function drawRayWall(ray, mp, disT, isVertical, isUp, isLeft, r, colorMod) {
     },0,0)`;
     ctx.lineWidth = horRes;
     ctx.stroke();
+
+    // if (fogEnabled) {
+    //   ctx.globalAlpha = 1 - colorMod;
+    //   ctx.fillStyle = "black";
+    //   ctx.fillRect(r * horRes, lineO, horRes, lineH);
+    //   let ratio = (disT - FOG.START) / (FOG.END - FOG.START);
+    //   if (ratio > 1) ratio = 1;
+    //   if (ratio < 0) ratio = 0;
+    //   ctx.globalAlpha = ratio;
+    //   ctx.fillStyle = "white";
+    //   ctx.fillRect(r * horRes, lineO, horRes, lineH);
+    //   ctx.globalAlpha = 1.0;
+    // }
   }
 }
 
@@ -514,28 +546,46 @@ function changeQualityHandler(e) {
 
 function drawUI() {
   ctx.fillStyle = "green";
-  ctx.fillRect(0, 450, view.width, 150);
+  ctx.fillRect(0, view.height * 0.75, view.width, view.height * 0.25);
   ctx.beginPath();
   //400,255
-  ctx.moveTo(400, 200);
-  ctx.lineTo(400, 210);
 
-  ctx.moveTo(400, 240);
-  ctx.lineTo(400, 250);
+  //#region Crosshair
+  const crosshairLineWidth = 4;
+  const crosshairLineWidthHalf = 0;
+  const space = 10;
+  const width = 15;
+  ctx.moveTo(view.width * 0.5, view.halfHeight * 0.75 - space - width);
+  ctx.lineTo(view.width * 0.5, view.halfHeight * 0.75 - space);
 
-  ctx.moveTo(415, 225);
-  ctx.lineTo(425, 225);
+  ctx.moveTo(view.width * 0.5, view.halfHeight * 0.75 + space + width);
+  ctx.lineTo(view.width * 0.5, view.halfHeight * 0.75 + space);
 
-  ctx.moveTo(385, 225);
-  ctx.lineTo(375, 225);
+  ctx.moveTo(view.width * 0.5 - space - width, view.halfHeight * 0.75);
+  ctx.lineTo(view.width * 0.5 - space, view.halfHeight * 0.75);
+
+  ctx.moveTo(view.width * 0.5 + space + width, view.halfHeight * 0.75);
+  ctx.lineTo(view.width * 0.5 + space, view.halfHeight * 0.75);
 
   ctx.strokeStyle = "green";
-  ctx.lineWidth = 4;
+  ctx.lineWidth = crosshairLineWidth;
   ctx.stroke();
+  //#endregion
 
+  //#region UI Text
   ctx.fillStyle = "black";
-  ctx.font = "30px Arial";
-  ctx.fillText("WASD or Arrow Keys to move", 10, 485);
-  ctx.fillText("SPACE to shoot", 10, 520);
-  ctx.fillText(`${Math.trunc(1 / dt)} fps`, 10, 555);
+  const fontSize = 30;
+  ctx.font = `${fontSize}px Arial`;
+  ctx.fillText(
+    "WASD or Arrow Keys to move",
+    10,
+    view.height * 0.75 + fontSize + 5
+  ); //485);
+  ctx.fillText("SPACE to shoot", 10, view.height * 0.75 + (fontSize + 5) * 2);
+  ctx.fillText(
+    `${Math.trunc(1 / dt)} fps`,
+    10,
+    view.height * 0.75 + (fontSize + 5) * 3
+  );
+  //#endregion
 }

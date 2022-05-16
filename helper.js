@@ -1,3 +1,5 @@
+// @ts-check
+
 function lineIntersect(
   l = { x1: 0, y1: 0, x2: 0, y2: 0 },
   r = { x1: 0, y1: 0, x2: 0, y2: 0 }
@@ -35,7 +37,6 @@ function pointRightOfLine(l, p) {
   let b = { x: p.x - l.x1, y: p.y - l.y1 };
   return crossProduct(a, b) < 0;
 }
-
 function crossProduct(a, b) {
   return a.x * b.y - b.x * a.y;
 }
@@ -57,4 +58,12 @@ function dist(ax, ay, bx, by) {
 function norm(vec) {
   let mag = dist(vec.x, vec.y, 0, 0);
   return { x: vec.x / mag, y: vec.y / mag };
+}
+
+function roundToWorld(value) {
+  return roundToMap(value) << 6;
+}
+
+function roundToMap(value) {
+  return Math.trunc(value) >> 6;
 }
