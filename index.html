@@ -38,25 +38,6 @@
       style="display: none"
     ></canvas>
 
-    <script src="vec2.js"></script>
-    <script src="helper.js"></script>
-    <script src="keyboard.js"></script>
-    <script src="map.js"></script>
-    <script src="player.js"></script>
-    <script src="entity.js"></script>
-    <script src="enemy.js"></script>
-    <script src="bullet.js"></script>
-    <script src="src.js"></script>
-    <script>
-      function toggleMap() {
-        drawMap = !drawMap;
-        document.getElementById("map").style.display = drawMap
-          ? "block"
-          : "none";
-      }
-      function toggleFog() {
-        fogEnabled = !fogEnabled;
-      }
-    </script>
+    <script src="dist/bundle.js"></script>
   </body>
 </html>
