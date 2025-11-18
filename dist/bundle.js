@@ -920,12 +920,19 @@ function drawUI() {
     view.height * 0.75 + fontSize + 5
   );
   ctx.fillText("SPACE to shoot", 10, view.height * 0.75 + (fontSize + 5) * 2);
+  fpsCounterBuffer += dt;
+  if (fpsCounterBuffer > 0.25) {
+    fpsCounterBuffer = 0;
+    fpsLast = Math.trunc(1 / dt);
+  }
   ctx.fillText(
-    `${Math.trunc(1 / dt)} fps`,
+    `${fpsLast} fps`,
     10,
     view.height * 0.75 + (fontSize + 5) * 3
   );
 }
+var fpsCounterBuffer = 0;
+var fpsLast = 0;
 function toggleMap() {
   drawMap = !drawMap;
   map_c.style.display = drawMap ? "block" : "none";
