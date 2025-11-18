@@ -1,7 +1,7 @@
 import { dist, norm } from "./helper";
-import { Map } from "./map";
+import { GameMap } from "./map";
 
-interface PlayerLike {
+export interface PlayerLike {
   x: number;
   y: number;
   a: number;
@@ -104,7 +104,7 @@ export class Entity {
     const ca = player.a - t;
     const correctedDistance = disT * Math.cos(ca);
 
-    const lineH = Math.trunc((Map.size * view.height * height) / correctedDistance);
+    const lineH = Math.trunc((GameMap.size * view.height * height) / correctedDistance);
     const lineO = view.halfHeight * 0.75 - Math.trunc(lineH / 2);
 
     if (drawMap) {
@@ -148,7 +148,7 @@ export class Entity {
     }
   }
 
-  update(player: PlayerLike, normFn: typeof norm, map: Map<number[]>): void {}
+  update(player: PlayerLike, normFn: typeof norm, map: GameMap): void {}
 
   drawTracerLine(map_ctx: CanvasRenderingContext2D, player: PlayerLike) {
     map_ctx.strokeStyle = "blue";

@@ -13,7 +13,7 @@ imgSrcs.forEach((src, i) => {
 });
 
 // src/map.ts
-var Map = class _Map extends Array {
+var GameMap = class _GameMap extends Array {
   constructor(m) {
     super(...m);
     this.img = null;
@@ -25,26 +25,24 @@ var Map = class _Map extends Array {
     this.img = null;
   }
   draw(ctx2, c2, { drawMap: drawMap2 = false, textures = walls } = {}) {
-    if (!drawMap2) {
-      return;
-    }
+    if (!drawMap2) return;
     if (this.img == null) {
       ctx2.fillStyle = "gray";
       ctx2.fillRect(0, 0, c2.width, c2.height);
       for (let y = 0; y < this.height; y++) {
         for (let x = 0; x < this.width; x++) {
-          const xo = x * _Map.size;
-          const yo = y * _Map.size;
+          const xo = x * _GameMap.size;
+          const yo = y * _GameMap.size;
           const i = this[y][x];
           const texture = textures[i];
           if (i > 0 && texture) {
-            ctx2.drawImage(texture, xo, yo, _Map.size, _Map.size);
+            ctx2.drawImage(texture, xo, yo, _GameMap.size, _GameMap.size);
           } else if (i > 0) {
             ctx2.fillStyle = "red";
-            ctx2.fillRect(xo + 1, yo + 1, _Map.size - 1, _Map.size - 1);
+            ctx2.fillRect(xo + 1, yo + 1, _GameMap.size - 1, _GameMap.size - 1);
           } else {
             ctx2.fillStyle = "black";
-            ctx2.fillRect(xo + 1, yo + 1, _Map.size - 1, _Map.size - 1);
+            ctx2.fillRect(xo + 1, yo + 1, _GameMap.size - 1, _GameMap.size - 1);
           }
         }
       }
@@ -252,7 +250,7 @@ var Entity = class {
     }
     const ca = player2.a - t;
     const correctedDistance = disT * Math.cos(ca);
-    const lineH = Math.trunc(Map.size * view2.height * height / correctedDistance);
+    const lineH = Math.trunc(GameMap.size * view2.height * height / correctedDistance);
     const lineO = view2.halfHeight * 0.75 - Math.trunc(lineH / 2);
     if (drawMap2) {
       this.drawTracerLine(map_ctx2, player2);
@@ -451,7 +449,7 @@ var TWO_PI = Math.PI * 2;
 var DR = Math.PI / 180;
 var RD = 180 / Math.PI;
 var DOF = 100;
-var FOG = { START: 3 * Map.size, END: 9 * Map.size };
+var FOG = { START: 3 * GameMap.size, END: 9 * GameMap.size };
 var view = {
   get width() {
     return c.width;
@@ -487,7 +485,7 @@ var spawnBullet = (bullet) => {
   entityStore.bullets.push(bullet);
 };
 var mapMatrix = [
-  [1, 2, 2, 2, 0, 1, 1, 1, 1, 1, 2, 2, 1],
+  [1, 2, 2, 2, 2, 1, 1, 1, 1, 1, 2, 2, 1],
   [1, 0, 2, 0, 0, 2, 1, 0, 0, 0, 0, 2, 2],
   [1, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 2, 2],
   [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
@@ -502,7 +500,7 @@ var mapMatrix = [
   [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 ];
-var map = new Map(mapMatrix);
+var map = new GameMap(mapMatrix);
 var myKeys = new Keyboard();
 var player = new Player(300, 300);
 enemies.push(new Enemy(600, 450, 10, "https://i.imgur.com/FcIXhVp.png"));
@@ -521,8 +519,8 @@ function init() {
     r.addEventListener("change", changeQualityHandler);
   });
   updateHorRes(8);
-  map_c.width = map[0].length * Map.size;
-  map_c.height = map.length * Map.size;
+  map_c.width = map[0].length * GameMap.size;
+  map_c.height = map.length * GameMap.size;
   map_ctx.imageSmoothingEnabled = false;
   ctx.imageSmoothingEnabled = false;
   window.toggleMap = toggleMap;
@@ -718,15 +716,15 @@ function castHorizontalRay(angle) {
   let hy = player.y;
   const aTan = -1 / Math.tan(angle);
   if (angle > Math.PI) {
-    rayY = Math.floor(player.y / Map.size) * Map.size - 1e-4;
+    rayY = Math.floor(player.y / GameMap.size) * GameMap.size - 1e-4;
     rayX = (player.y - rayY) * aTan + player.x;
-    yo = -Map.size;
+    yo = -GameMap.size;
     xo = -yo * aTan;
     isUp = true;
   } else if (angle < Math.PI) {
-    rayY = Math.floor(player.y / Map.size) * Map.size + Map.size;
+    rayY = Math.floor(player.y / GameMap.size) * GameMap.size + GameMap.size;
     rayX = (player.y - rayY) * aTan + player.x;
-    yo = Map.size;
+    yo = GameMap.size;
     xo = -yo * aTan;
     isUp = false;
   } else {
@@ -763,15 +761,15 @@ function castVerticalRay(angle) {
   let vy = player.y;
   const nTan = -Math.tan(angle);
   if (angle > P2 && angle < P3) {
-    rayX = Math.floor(player.x / Map.size) * Map.size - 1e-4;
+    rayX = Math.floor(player.x / GameMap.size) * GameMap.size - 1e-4;
     rayY = (player.x - rayX) * nTan + player.y;
-    xo = -Map.size;
+    xo = -GameMap.size;
     yo = -xo * nTan;
     isLeft = true;
   } else if (angle < P2 || angle > P3) {
-    rayX = Math.floor(player.x / Map.size) * Map.size + Map.size;
+    rayX = Math.floor(player.x / GameMap.size) * GameMap.size + GameMap.size;
     rayY = (player.x - rayX) * nTan + player.y;
-    xo = Map.size;
+    xo = GameMap.size;
     yo = -xo * nTan;
     isLeft = false;
   } else {
@@ -828,15 +826,15 @@ function applyFog(rayData) {
 function getFarRayPoint(angle) {
   const direction = { x: Math.cos(angle), y: Math.sin(angle) };
   return {
-    x: player.x + direction.x * Map.size * DOF,
-    y: player.y + direction.y * Map.size * DOF
+    x: player.x + direction.x * GameMap.size * DOF,
+    y: player.y + direction.y * GameMap.size * DOF
   };
 }
 var _rays;
 function drawRayWall(ray, mp, disT, isVertical, isUp, isLeft, r, colorMod) {
   let ca = player.a - ray.a;
   disT *= Math.cos(ca);
-  let lineH = Math.trunc(Map.size * view.height * 0.75 / disT);
+  let lineH = Math.trunc(GameMap.size * view.height * 0.75 / disT);
   let lineO = view.height * 0.75 / 2 - Math.trunc(lineH / 2);
   if (!mp) {
     ctx.beginPath();
@@ -853,13 +851,13 @@ function drawRayWall(ray, mp, disT, isVertical, isUp, isLeft, r, colorMod) {
   if (imgID > 0 && walls[imgID]) {
     let percentage = 1;
     if (!isVertical && isUp) {
-      percentage = ray.x % Map.size / Map.size;
+      percentage = ray.x % GameMap.size / GameMap.size;
     } else if (!isVertical && !isUp) {
-      percentage = 1 - ray.x % Map.size / Map.size;
+      percentage = 1 - ray.x % GameMap.size / GameMap.size;
     } else if (isVertical && !isLeft) {
-      percentage = ray.y % Map.size / Map.size;
+      percentage = ray.y % GameMap.size / GameMap.size;
     } else if (isVertical && isLeft) {
-      percentage = 1 - ray.y % Map.size / Map.size;
+      percentage = 1 - ray.y % GameMap.size / GameMap.size;
     }
     let pixelX = Math.trunc(walls[imgID].width * percentage);
     ctx.drawImage(

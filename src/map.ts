@@ -5,7 +5,7 @@ interface DrawOptions {
   textures?: Array<HTMLImageElement | undefined>;
 }
 
-export class Map extends Array<number[]> {
+export class GameMap extends Array<number[]> {
   width: number;
   height: number;
   img: ImageData | null = null;
@@ -26,26 +26,24 @@ export class Map extends Array<number[]> {
     c: HTMLCanvasElement,
     { drawMap = false, textures = defaultWalls }: DrawOptions = {}
   ) {
-    if (!drawMap) {
-      return;
-    }
+    if (!drawMap) return
     if (this.img == null) {
       ctx.fillStyle = "gray";
       ctx.fillRect(0, 0, c.width, c.height);
       for (let y = 0; y < this.height; y++) {
         for (let x = 0; x < this.width; x++) {
-          const xo = x * Map.size;
-          const yo = y * Map.size;
+          const xo = x * GameMap.size;
+          const yo = y * GameMap.size;
           const i = this[y][x];
           const texture = textures[i];
           if (i > 0 && texture) {
-            ctx.drawImage(texture, xo, yo, Map.size, Map.size);
+            ctx.drawImage(texture, xo, yo, GameMap.size, GameMap.size);
           } else if (i > 0) {
             ctx.fillStyle = "red";
-            ctx.fillRect(xo + 1, yo + 1, Map.size - 1, Map.size - 1);
+            ctx.fillRect(xo + 1, yo + 1, GameMap.size - 1, GameMap.size - 1);
           } else {
             ctx.fillStyle = "black";
-            ctx.fillRect(xo + 1, yo + 1, Map.size - 1, Map.size - 1);
+            ctx.fillRect(xo + 1, yo + 1, GameMap.size - 1, GameMap.size - 1);
           }
         }
       }

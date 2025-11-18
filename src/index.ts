@@ -1,4 +1,4 @@
-import { Map } from './map'
+import { GameMap } from './map'
 import { Player } from './player'
 import { Enemy } from './enemy'
 import { Entity } from './entity'
@@ -7,7 +7,7 @@ import { lineIntersect, pointInsideAABB, dist, norm } from './helper'
 import { walls } from './textures'
 import type { Bullet } from './bullet'
 
-;('use strict')
+  ; ('use strict')
 
 window.addEventListener('load', init)
 
@@ -25,7 +25,7 @@ const TWO_PI = Math.PI * 2
 const DR = Math.PI / 180 // one degree in radians
 const RD = 180 / Math.PI // one radian in degrees
 const DOF = 100
-const FOG = { START: 3 * Map.size, END: 9 * Map.size }
+const FOG = { START: 3 * GameMap.size, END: 9 * GameMap.size }
 
 interface Viewport {
   width: number
@@ -77,7 +77,7 @@ const spawnBullet = (bullet: Bullet) => {
 }
 
 const mapMatrix: number[][] = [
-  [1, 2, 2, 2, 0, 1, 1, 1, 1, 1, 2, 2, 1],
+  [1, 2, 2, 2, 2, 1, 1, 1, 1, 1, 2, 2, 1],
   [1, 0, 2, 0, 0, 2, 1, 0, 0, 0, 0, 2, 2],
   [1, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 2, 2],
   [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
@@ -92,7 +92,7 @@ const mapMatrix: number[][] = [
   [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ]
-const map = new Map(mapMatrix)
+const map = new GameMap(mapMatrix)
 
 const myKeys = new Keyboard()
 const player = new Player(300, 300)
@@ -118,8 +118,8 @@ function init() {
     })
   updateHorRes(8)
 
-  map_c.width = map[0].length * Map.size
-  map_c.height = map.length * Map.size
+  map_c.width = map[0].length * GameMap.size
+  map_c.height = map.length * GameMap.size
   map_ctx.imageSmoothingEnabled = false
   ctx.imageSmoothingEnabled = false
 
@@ -350,15 +350,15 @@ function castHorizontalRay(angle: number) {
   const aTan = -1 / Math.tan(angle)
 
   if (angle > Math.PI) {
-    rayY = Math.floor(player.y / Map.size) * Map.size - 0.0001
+    rayY = Math.floor(player.y / GameMap.size) * GameMap.size - 0.0001
     rayX = (player.y - rayY) * aTan + player.x
-    yo = -Map.size
+    yo = -GameMap.size
     xo = -yo * aTan
     isUp = true
   } else if (angle < Math.PI) {
-    rayY = Math.floor(player.y / Map.size) * Map.size + Map.size
+    rayY = Math.floor(player.y / GameMap.size) * GameMap.size + GameMap.size
     rayX = (player.y - rayY) * aTan + player.x
-    yo = Map.size
+    yo = GameMap.size
     xo = -yo * aTan
     isUp = false
   } else {
@@ -406,15 +406,15 @@ function castVerticalRay(angle: number) {
   const nTan = -Math.tan(angle)
 
   if (angle > P2 && angle < P3) {
-    rayX = Math.floor(player.x / Map.size) * Map.size - 0.0001
+    rayX = Math.floor(player.x / GameMap.size) * GameMap.size - 0.0001
     rayY = (player.x - rayX) * nTan + player.y
-    xo = -Map.size
+    xo = -GameMap.size
     yo = -xo * nTan
     isLeft = true
   } else if (angle < P2 || angle > P3) {
-    rayX = Math.floor(player.x / Map.size) * Map.size + Map.size
+    rayX = Math.floor(player.x / GameMap.size) * GameMap.size + GameMap.size
     rayY = (player.x - rayX) * nTan + player.y
-    xo = Map.size
+    xo = GameMap.size
     yo = -xo * nTan
     isLeft = false
   } else {
@@ -482,8 +482,8 @@ function applyFog(rayData: any) {
 function getFarRayPoint(angle: number) {
   const direction = { x: Math.cos(angle), y: Math.sin(angle) }
   return {
-    x: player.x + direction.x * Map.size * DOF,
-    y: player.y + direction.y * Map.size * DOF,
+    x: player.x + direction.x * GameMap.size * DOF,
+    y: player.y + direction.y * GameMap.size * DOF,
   }
 }
 
@@ -502,7 +502,7 @@ function drawRayWall(
   let ca = player.a - ray.a
 
   disT *= Math.cos(ca)
-  let lineH = Math.trunc((Map.size * view.height * 0.75) / disT)
+  let lineH = Math.trunc((GameMap.size * view.height * 0.75) / disT)
   let lineO = (view.height * 0.75) / 2 - Math.trunc(lineH / 2)
 
   if (!mp) {
@@ -521,13 +521,13 @@ function drawRayWall(
   if (imgID > 0 && walls[imgID]) {
     let percentage = 1
     if (!isVertical && isUp) {
-      percentage = (ray.x % Map.size) / Map.size
+      percentage = (ray.x % GameMap.size) / GameMap.size
     } else if (!isVertical && !isUp) {
-      percentage = 1 - (ray.x % Map.size) / Map.size
+      percentage = 1 - (ray.x % GameMap.size) / GameMap.size
     } else if (isVertical && !isLeft) {
-      percentage = (ray.y % Map.size) / Map.size
+      percentage = (ray.y % GameMap.size) / GameMap.size
     } else if (isVertical && isLeft) {
-      percentage = 1 - (ray.y % Map.size) / Map.size
+      percentage = 1 - (ray.y % GameMap.size) / GameMap.size
     }
 
     let pixelX = Math.trunc(walls[imgID].width * percentage)
@@ -554,11 +554,10 @@ function drawRayWall(
     ctx.beginPath()
     ctx.moveTo(r * horRes + halfHorRes, lineO)
     ctx.lineTo(r * horRes + halfHorRes, lineH + lineO)
-    ctx.strokeStyle = `rgb(${
-      Math.min(Math.min(lineH, view.height) / view.height + 0.2, 1) *
+    ctx.strokeStyle = `rgb(${Math.min(Math.min(lineH, view.height) / view.height + 0.2, 1) *
       200 *
       colorMod
-    },0,0)`
+      },0,0)`
     ctx.lineWidth = horRes
     ctx.stroke()
   }
@@ -608,12 +607,21 @@ function drawUI() {
     view.height * 0.75 + fontSize + 5
   )
   ctx.fillText('SPACE to shoot', 10, view.height * 0.75 + (fontSize + 5) * 2)
+
+  fpsCounterBuffer += dt
+  if (fpsCounterBuffer > 0.25) {
+    fpsCounterBuffer = 0
+    fpsLast = Math.trunc(1 / dt)
+  }
   ctx.fillText(
-    `${Math.trunc(1 / dt)} fps`,
-    10,
-    view.height * 0.75 + (fontSize + 5) * 3
-  )
+      `${fpsLast} fps`,
+      10,
+      view.height * 0.75 + (fontSize + 5) * 3
+    )
 }
+
+let fpsCounterBuffer = 0
+let fpsLast = 0
 
 function toggleMap() {
   drawMap = !drawMap

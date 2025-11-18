@@ -1,10 +1,5 @@
-import { Entity } from "./entity";
+import { Entity, PlayerLike } from "./entity";
 import { norm, Point } from "./helper";
-
-interface PlayerLike {
-  x: number;
-  y: number;
-}
 
 interface DrawOptions {
   fov?: number;

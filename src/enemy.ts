@@ -1,10 +1,5 @@
-import { Entity } from "./entity";
+import { Entity, PlayerLike } from "./entity";
 import { norm } from "./helper";
-
-interface PlayerLike {
-  x: number;
-  y: number;
-}
 
 export class Enemy extends Entity {
   constructor(x: number, y: number, size: number, src: string | string[]) {
