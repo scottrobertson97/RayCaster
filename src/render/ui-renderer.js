@@ -35,6 +35,17 @@ export function drawUI(state) {
   state.ctx.fillText('WASD or Arrow Keys to move', 10, uiTop + FONT_SIZE + 5)
   state.ctx.fillText('SPACE to shoot', 10, uiTop + (FONT_SIZE + 5) * 2)
   state.ctx.fillText('E to open/close doors', 10, uiTop + (FONT_SIZE + 5) * 3)
+  state.ctx.fillText(
+    `Red keycard: ${state.inventory.hasRedKeycard ? 'YES' : 'NO'}`,
+    10,
+    uiTop + (FONT_SIZE + 5) * 4
+  )
+
+  if (state.uiNotice.timer > 0 && state.uiNotice.text) {
+    state.ctx.fillStyle = '#aa0000'
+    state.ctx.fillText(state.uiNotice.text, state.view.width * 0.45, uiTop + FONT_SIZE + 5)
+    state.ctx.fillStyle = 'black'
+  }
 
   state.fpsCounterBuffer += state.dt
   if (state.fpsCounterBuffer > FPS_UPDATE_INTERVAL) {
@@ -42,5 +53,5 @@ export function drawUI(state) {
     state.fpsLast = Math.trunc(1 / state.dt)
   }
 
-  state.ctx.fillText(`${state.fpsLast} fps`, 10, uiTop + (FONT_SIZE + 5) * 4)
+  state.ctx.fillText(`${state.fpsLast} fps`, 10, uiTop + (FONT_SIZE + 5) * 5)
 }

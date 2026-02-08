@@ -5,8 +5,9 @@ export function createGameState({ viewCanvas, mapCanvas, ctx, mapCtx, map, playe
   const entityStore = {
     bullets: [],
     enemies: [],
+    pickups: [],
     getEntities() {
-      return this.enemies.concat(this.bullets)
+      return this.enemies.concat(this.bullets, this.pickups)
     },
   }
 
@@ -23,6 +24,13 @@ export function createGameState({ viewCanvas, mapCanvas, ctx, mapCtx, map, playe
     walls,
     entityStore,
     doors: {},
+    inventory: {
+      hasRedKeycard: false,
+    },
+    uiNotice: {
+      text: '',
+      timer: 0,
+    },
     drawMap: false,
     fogEnabled: false,
     drawRays: true,

@@ -45,6 +45,15 @@ export class Player {
   }
 
   move(dt, kb, map) {
+    const mapHeight = map.length
+    const mapWidth = map[0]?.length ?? 0
+    const tileAt = (tileX, tileY) => {
+      if (tileY < 0 || tileY >= mapHeight || tileX < 0 || tileX >= mapWidth) {
+        return 1
+      }
+      return map[tileY][tileX]
+    }
+
     const d = kb.move()
     this.dx = Math.cos(this.a) * this.speed * dt
     this.dy = Math.sin(this.a) * this.speed * dt
@@ -55,11 +64,11 @@ export class Player {
     const newX = Math.trunc(this.x + this.dx * d) >> 6
     const newY = Math.trunc(this.y + this.dy * d) >> 6
 
-    if (!map[newY][newX] || newX === oldX || (newY !== oldY && !map[oldY][newX])) {
+    if (!tileAt(newX, newY) || newX === oldX || (newY !== oldY && !tileAt(newX, oldY))) {
       this.x += this.dx * d
     }
 
-    if (!map[newY][newX] || newY === oldY || (newX !== oldX && !map[newY][oldX])) {
+    if (!tileAt(newX, newY) || newY === oldY || (newX !== oldX && !tileAt(oldX, newY))) {
       this.y += this.dy * d
     }
   }

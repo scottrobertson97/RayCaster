@@ -13,6 +13,7 @@ import { updateBullets } from './systems/bullet-system.js'
 import { updateEnemies } from './systems/enemy-system.js'
 import { startFrameLoop } from './systems/frame-loop.js'
 import { handleDoorActivation, initializeDoorsFromMap, updateDoors } from './systems/door-system.js'
+import { initializeKeycardsFromMap, updateKeycardPickups } from './systems/keycard-system.js'
 import { updatePlayer } from './systems/player-system.js'
 import { bindControls } from './ui/controls.js'
 
@@ -41,6 +42,7 @@ function init() {
 
   setupCanvas(state)
   initializeDoorsFromMap(state)
+  initializeKeycardsFromMap(state)
   seedEntities(state)
   bindControls(state)
 
@@ -73,6 +75,7 @@ function seedEntities(state) {
 
 function updateFrame(state) {
   updatePlayer(state)
+  updateKeycardPickups(state)
   handleDoorActivation(state)
   updateDoors(state)
   updateEnemies(state)

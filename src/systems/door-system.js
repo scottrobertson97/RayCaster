@@ -2,12 +2,15 @@ import {
   DOOR_CLOSE_DURATION,
   DOOR_HOLD_DURATION,
   DOOR_INTERACT_RANGE,
+  DOOR_LOCKED_RED_TILE_ID,
   DOOR_OPEN_DURATION,
   DOOR_OPEN_PASSABLE_THRESHOLD,
-  DOOR_TILE_ID,
+  DOOR_UNLOCKED_TILE_ID,
+  KEY_RED,
 } from '../config/constants.js'
 import { Keyboard } from '../input/keyboard-state.js'
 import { GameMap } from '../map/game-map.js'
+import { setUiNotice } from './keycard-system.js'
 
 const DOOR_CLOSE_RETRY_DELAY = 0.15
 const EPSILON = 0.000001
@@ -22,6 +25,35 @@ function worldToTile(value) {
 
 function setDoorPhase(door, phase) {
   door.phase = phase
+}
+
+function isDoorTile(tile) {
+  return tile === DOOR_UNLOCKED_TILE_ID || tile === DOOR_LOCKED_RED_TILE_ID
+}
+
+function getClosedDoorTile(door) {
+  return door.locked ? DOOR_LOCKED_RED_TILE_ID : DOOR_UNLOCKED_TILE_ID
+}
+
+function hasRequiredKey(state, door) {
+  if (!door.requiredKey) return true
+  if (door.requiredKey === KEY_RED) return state.inventory.hasRedKeycard
+  return false
+}
+
+function tryUnlockDoor(state, door) {
+  if (!door.locked) return true
+  if (!hasRequiredKey(state, door)) {
+    if (door.requiredKey === KEY_RED) {
+      setUiNotice(state, 'Red keycard required')
+    }
+    return false
+  }
+
+  door.locked = false
+  door.requiredKey = null
+  ensureDoorTile(state, door, DOOR_UNLOCKED_TILE_ID)
+  return true
 }
 
 function ensureDoorTile(state, door, tileValue) {
@@ -61,7 +93,7 @@ function getClosestDoorInFront(state) {
     }
 
     const sampledTile = state.map[tileY][tileX]
-    if (sampledTile > 0 && sampledTile !== DOOR_TILE_ID) {
+    if (sampledTile > 0 && !isDoorTile(sampledTile)) {
       break
     }
 
@@ -86,6 +118,7 @@ function getClosestDoorInFront(state) {
 }
 
 function activateDoor(state, door) {
+  if (!tryUnlockDoor(state, door)) return
   if (door.phase === 'opening') return
 
   if (door.phase === 'closing') {
@@ -124,12 +157,12 @@ function updateDoorOpen(state, door) {
     return
   }
 
-  ensureDoorTile(state, door, DOOR_TILE_ID)
+  ensureDoorTile(state, door, getClosedDoorTile(door))
   setDoorPhase(door, 'closing')
 }
 
 function updateDoorClosing(state, door) {
-  ensureDoorTile(state, door, DOOR_TILE_ID)
+  ensureDoorTile(state, door, getClosedDoorTile(door))
 
   if (isDoorBlockedByActors(state, door)) {
     ensureDoorTile(state, door, 0)
@@ -151,12 +184,15 @@ export function initializeDoorsFromMap(state) {
 
   for (let y = 0; y < state.map.height; y++) {
     for (let x = 0; x < state.map.width; x++) {
-      if (state.map[y][x] !== DOOR_TILE_ID) continue
+      const tile = state.map[y][x]
+      if (!isDoorTile(tile)) continue
 
       const key = getDoorKey(x, y)
       doors[key] = {
         tileX: x,
         tileY: y,
+        locked: tile === DOOR_LOCKED_RED_TILE_ID,
+        requiredKey: tile === DOOR_LOCKED_RED_TILE_ID ? KEY_RED : null,
         phase: 'closed',
         openAmount: 0,
         holdTimer: 0,
@@ -194,6 +230,6 @@ export function updateDoors(state) {
       return
     }
 
-    ensureDoorTile(state, door, DOOR_TILE_ID)
+    ensureDoorTile(state, door, getClosedDoorTile(door))
   })
 }
