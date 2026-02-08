@@ -22,6 +22,7 @@ export function createGameState({ viewCanvas, mapCanvas, ctx, mapCtx, map, playe
     keyboard,
     walls,
     entityStore,
+    doors: {},
     drawMap: false,
     fogEnabled: false,
     drawRays: true,

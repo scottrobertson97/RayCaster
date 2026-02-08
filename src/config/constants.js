@@ -16,3 +16,10 @@ export const CROSSHAIR_WIDTH = 15
 
 export const FPS_UPDATE_INTERVAL = 0.25
 export const FONT_SIZE = 30
+
+export const DOOR_TILE_ID = 3
+export const DOOR_INTERACT_RANGE = 0.9 * 64
+export const DOOR_OPEN_DURATION = 0.35
+export const DOOR_HOLD_DURATION = 2.0
+export const DOOR_CLOSE_DURATION = 0.5
+export const DOOR_OPEN_PASSABLE_THRESHOLD = 1.0

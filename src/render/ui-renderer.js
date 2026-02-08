@@ -34,6 +34,7 @@ export function drawUI(state) {
   state.ctx.font = `${FONT_SIZE}px Arial`
   state.ctx.fillText('WASD or Arrow Keys to move', 10, uiTop + FONT_SIZE + 5)
   state.ctx.fillText('SPACE to shoot', 10, uiTop + (FONT_SIZE + 5) * 2)
+  state.ctx.fillText('E to open/close doors', 10, uiTop + (FONT_SIZE + 5) * 3)
 
   state.fpsCounterBuffer += state.dt
   if (state.fpsCounterBuffer > FPS_UPDATE_INTERVAL) {
@@ -41,5 +42,5 @@ export function drawUI(state) {
     state.fpsLast = Math.trunc(1 / state.dt)
   }
 
-  state.ctx.fillText(`${state.fpsLast} fps`, 10, uiTop + (FONT_SIZE + 5) * 3)
+  state.ctx.fillText(`${state.fpsLast} fps`, 10, uiTop + (FONT_SIZE + 5) * 4)
 }

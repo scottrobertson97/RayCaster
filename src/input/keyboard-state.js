@@ -52,5 +52,6 @@ export class Keyboard {
     KEY_S: 83,
     KEY_A: 65,
     KEY_D: 68,
+    KEY_E: 69,
   }
 }
