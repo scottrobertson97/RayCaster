@@ -46,7 +46,14 @@ export class Entity {
     return { x: this.x, y: this.y }
   }
 
-  draw(dt, player, ctx, mapCtx, view, { fov = 90, drawMap = false, height = 1 } = {}) {
+  draw(
+    dt,
+    player,
+    ctx,
+    mapCtx,
+    view,
+    { fov = 90, drawMap = false, height = 1, pitchOffset = 0 } = {}
+  ) {
     if (!this.imgRatio && this.img) {
       this.imgRatio = this.img.width / this.img.height
     }
@@ -67,7 +74,7 @@ export class Entity {
     const correctedDistance = disT * Math.cos(ca)
 
     const lineH = Math.trunc((GameMap.size * view.height * height) / correctedDistance)
-    const lineO = view.halfHeight * 0.75 - Math.trunc(lineH / 2)
+    const lineO = view.halfHeight * 0.75 - Math.trunc(lineH / 2) + pitchOffset
 
     if (drawMap) {
       this.drawTracerLine(mapCtx, player)

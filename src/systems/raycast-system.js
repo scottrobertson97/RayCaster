@@ -2,6 +2,10 @@ import { P2, P3, TWO_PI, DR, DOF } from '../config/constants.js'
 import { lineIntersect, dist, norm } from '../math/geometry.js'
 import { GameMap } from '../map/game-map.js'
 
+function isIgnoredTile(ignoreTile, tileX, tileY) {
+  return ignoreTile && ignoreTile.x === tileX && ignoreTile.y === tileY
+}
+
 export function normalizeAngle(angle) {
   angle %= TWO_PI
   return angle < 0 ? angle + TWO_PI : angle
@@ -67,9 +71,9 @@ export function castSceneRays(state, entitiesList) {
   return rays
 }
 
-export function castSceneRay(state, angle, column) {
-  const horizontalHit = castHorizontalRay(state, angle)
-  const verticalHit = castVerticalRay(state, angle)
+export function castSceneRay(state, angle, column, ignoreTile = null) {
+  const horizontalHit = castHorizontalRay(state, angle, ignoreTile)
+  const verticalHit = castVerticalRay(state, angle, ignoreTile)
   const useVertical = verticalHit.distance <= horizontalHit.distance
   const chosen = useVertical ? verticalHit : horizontalHit
   const hit = chosen.hit
@@ -89,7 +93,7 @@ export function castSceneRay(state, angle, column) {
   }
 }
 
-export function castHorizontalRay(state, angle) {
+export function castHorizontalRay(state, angle, ignoreTile = null) {
   const map = state.map
   const player = state.player
 
@@ -127,6 +131,15 @@ export function castHorizontalRay(state, angle) {
     const my = Math.trunc(rayY) >> 6
 
     if (mx >= 0 && my >= 0 && mx < map.width && my < map.height && map[my][mx] > 0) {
+      if (isIgnoredTile(ignoreTile, mx, my)) {
+        rayX += xo
+        rayY += yo
+        hx = rayX
+        hy = rayY
+        dof += 1
+        continue
+      }
+
       hx = rayX
       hy = rayY
       distance = dist(player.x, player.y, hx, hy)
@@ -144,7 +157,7 @@ export function castHorizontalRay(state, angle) {
   return { hit: mp !== null, distance, point: { x: hx, y: hy }, map: mp, isUp }
 }
 
-export function castVerticalRay(state, angle) {
+export function castVerticalRay(state, angle, ignoreTile = null) {
   const map = state.map
   const player = state.player
 
@@ -182,6 +195,15 @@ export function castVerticalRay(state, angle) {
     const my = Math.trunc(rayY) >> 6
 
     if (mx >= 0 && my >= 0 && mx < map.width && my < map.height && map[my][mx] > 0) {
+      if (isIgnoredTile(ignoreTile, mx, my)) {
+        rayX += xo
+        rayY += yo
+        vx = rayX
+        vy = rayY
+        dof += 1
+        continue
+      }
+
       vx = rayX
       vy = rayY
       distance = dist(player.x, player.y, vx, vy)

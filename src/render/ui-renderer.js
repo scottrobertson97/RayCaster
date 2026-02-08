@@ -9,6 +9,8 @@ import {
 
 export function drawUI(state) {
   const uiTop = state.view.height * WORLD_HEIGHT_RATIO
+  const hudFontSize = Math.min(FONT_SIZE, 20)
+  const hudLineStep = hudFontSize + 4
 
   state.ctx.fillStyle = 'green'
   state.ctx.fillRect(0, uiTop, state.view.width, state.view.height * 0.25)
@@ -31,19 +33,20 @@ export function drawUI(state) {
   state.ctx.stroke()
 
   state.ctx.fillStyle = 'black'
-  state.ctx.font = `${FONT_SIZE}px Arial`
-  state.ctx.fillText('WASD or Arrow Keys to move', 10, uiTop + FONT_SIZE + 5)
-  state.ctx.fillText('SPACE to shoot', 10, uiTop + (FONT_SIZE + 5) * 2)
-  state.ctx.fillText('E to open/close doors', 10, uiTop + (FONT_SIZE + 5) * 3)
+  state.ctx.font = `${hudFontSize}px Arial`
+  state.ctx.fillText('WASD or Arrow Keys to move', 10, uiTop + hudLineStep * 1)
+  state.ctx.fillText('SPACE to shoot', 10, uiTop + hudLineStep * 2)
+  state.ctx.fillText('E to open/close doors', 10, uiTop + hudLineStep * 3)
+  state.ctx.fillText('R/F to look up/down', 10, uiTop + hudLineStep * 4)
   state.ctx.fillText(
     `Red keycard: ${state.inventory.hasRedKeycard ? 'YES' : 'NO'}`,
     10,
-    uiTop + (FONT_SIZE + 5) * 4
+    uiTop + hudLineStep * 5
   )
 
   if (state.uiNotice.timer > 0 && state.uiNotice.text) {
     state.ctx.fillStyle = '#aa0000'
-    state.ctx.fillText(state.uiNotice.text, state.view.width * 0.45, uiTop + FONT_SIZE + 5)
+    state.ctx.fillText(state.uiNotice.text, state.view.width * 0.45, uiTop + hudLineStep * 1)
     state.ctx.fillStyle = 'black'
   }
 
@@ -53,5 +56,5 @@ export function drawUI(state) {
     state.fpsLast = Math.trunc(1 / state.dt)
   }
 
-  state.ctx.fillText(`${state.fpsLast} fps`, 10, uiTop + (FONT_SIZE + 5) * 5)
+  state.ctx.fillText(`${state.fpsLast} fps`, 10, uiTop + hudLineStep * 6)
 }

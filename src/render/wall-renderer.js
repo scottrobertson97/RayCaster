@@ -1,16 +1,46 @@
 import { GameMap } from '../map/game-map.js'
 import { WORLD_HEIGHT_RATIO } from '../config/constants.js'
+import { applyFog, castSceneRay } from '../systems/raycast-system.js'
+
+const DOOR_OPEN_EPSILON = 0.0001
+
+function getWallSamplePercent(ray, isVertical, isUp, isLeft) {
+  let percentage = 1
+
+  if (!isVertical && isUp) {
+    percentage = (ray.x % GameMap.size) / GameMap.size
+  } else if (!isVertical && !isUp) {
+    percentage = 1 - (ray.x % GameMap.size) / GameMap.size
+  } else if (isVertical && !isLeft) {
+    percentage = (ray.y % GameMap.size) / GameMap.size
+  } else if (isVertical && isLeft) {
+    percentage = 1 - (ray.y % GameMap.size) / GameMap.size
+  }
+
+  if (percentage < 0) return 0
+  if (percentage > 0.9999) return 0.9999
+  return percentage
+}
+
+function drawBehindDoorRay(state, rayData) {
+  const behindRayData = castSceneRay(state, rayData.ray.a, rayData.r, rayData.mp)
+  applyFog(state, behindRayData)
+  drawRayWall(state, behindRayData)
+}
 
 export function drawRayWall(state, rayData) {
   const { ray, mp, isVertical, isUp, isLeft, r, colorMod } = rayData
   const ctx = state.ctx
 
+  const worldHeight = state.view.height * WORLD_HEIGHT_RATIO
+  const pitchOffsetPx = Math.tan(state.player.pitch) * (worldHeight * 0.5)
+
   let disT = rayData.disT
   const ca = state.player.a - ray.a
 
   disT *= Math.cos(ca)
-  const lineH = Math.trunc((GameMap.size * state.view.height * WORLD_HEIGHT_RATIO) / disT)
-  const lineO = (state.view.height * WORLD_HEIGHT_RATIO) / 2 - Math.trunc(lineH / 2)
+  const lineH = Math.trunc((GameMap.size * worldHeight) / disT)
+  const lineO = worldHeight / 2 - Math.trunc(lineH / 2) + pitchOffsetPx
 
   if (!mp) {
     ctx.beginPath()
@@ -25,20 +55,15 @@ export function drawRayWall(state, rayData) {
   const x = mp.x
   const y = mp.y
   const imgID = state.map[y][x]
+  const percentage = getWallSamplePercent(ray, isVertical, isUp, isLeft)
+  const door = state.doors?.[`${x},${y}`]
+
+  if (door && door.openAmount > DOOR_OPEN_EPSILON && percentage < door.openAmount) {
+    drawBehindDoorRay(state, rayData)
+    return
+  }
 
   if (imgID > 0 && state.walls[imgID]) {
-    let percentage = 1
-
-    if (!isVertical && isUp) {
-      percentage = (ray.x % GameMap.size) / GameMap.size
-    } else if (!isVertical && !isUp) {
-      percentage = 1 - (ray.x % GameMap.size) / GameMap.size
-    } else if (isVertical && !isLeft) {
-      percentage = (ray.y % GameMap.size) / GameMap.size
-    } else if (isVertical && isLeft) {
-      percentage = 1 - (ray.y % GameMap.size) / GameMap.size
-    }
-
     const pixelX = Math.trunc(state.walls[imgID].width * percentage)
 
     ctx.drawImage(

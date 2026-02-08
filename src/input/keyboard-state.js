@@ -37,6 +37,17 @@ export class Keyboard {
     return d
   }
 
+  lookPitch() {
+    let d = 0
+    if (this.keydown[Keyboard.KEYBOARD.KEY_R]) {
+      d += 1
+    }
+    if (this.keydown[Keyboard.KEYBOARD.KEY_F]) {
+      d -= 1
+    }
+    return d
+  }
+
   snapshot() {
     this.previousKeydown = this.keydown.slice()
   }
@@ -53,5 +64,7 @@ export class Keyboard {
     KEY_A: 65,
     KEY_D: 68,
     KEY_E: 69,
+    KEY_R: 82,
+    KEY_F: 70,
   }
 }

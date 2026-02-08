@@ -24,8 +24,12 @@ export const KEY_RED = 'red'
 
 // Backward-compatible alias for existing door logic.
 export const DOOR_TILE_ID = DOOR_UNLOCKED_TILE_ID
-export const DOOR_INTERACT_RANGE = 0.9 * 64
+export const DOOR_INTERACT_RANGE = 1.5 * 64
 export const DOOR_OPEN_DURATION = 0.35
 export const DOOR_HOLD_DURATION = 2.0
 export const DOOR_CLOSE_DURATION = 0.5
 export const DOOR_OPEN_PASSABLE_THRESHOLD = 1.0
+
+export const LOOK_PITCH_MAX_DEG = 35
+export const LOOK_PITCH_MAX_RAD = (LOOK_PITCH_MAX_DEG * Math.PI) / 180
+export const LOOK_PITCH_SPEED = 2.0

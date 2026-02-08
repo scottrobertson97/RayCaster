@@ -1,4 +1,5 @@
 import { Vec2 } from '../math/vec2.js'
+import { LOOK_PITCH_MAX_RAD, LOOK_PITCH_SPEED } from '../config/constants.js'
 import { Keyboard } from '../input/keyboard-state.js'
 import { Bullet } from './bullet.js'
 import { norm } from '../math/geometry.js'
@@ -7,6 +8,7 @@ export class Player {
   constructor(x = 0, y = 0, a = 0, speed = 200, lookSpeed = 2) {
     this.pos = new Vec2({ x, y })
     this.a = a
+    this.pitch = 0
     this.speed = speed
     this.lookSpeed = lookSpeed
     this.dx = Math.cos(this.a) * this.speed * (1 / 60)
@@ -31,6 +33,7 @@ export class Player {
 
   update(dt, kb, map, spawnBullet) {
     this.turn(dt, kb)
+    this.look(dt, kb)
     this.move(dt, kb, map)
     this.shoot(kb, spawnBullet)
   }
@@ -42,6 +45,15 @@ export class Player {
     this.a += this.lookSpeed * dt * d
     if (this.a > Math.PI * 2) this.a -= Math.PI * 2
     if (this.a < 0) this.a += Math.PI * 2
+  }
+
+  look(dt, kb) {
+    const d = kb.lookPitch()
+    if (!d) return
+
+    this.pitch += d * LOOK_PITCH_SPEED * dt
+    if (this.pitch > LOOK_PITCH_MAX_RAD) this.pitch = LOOK_PITCH_MAX_RAD
+    if (this.pitch < -LOOK_PITCH_MAX_RAD) this.pitch = -LOOK_PITCH_MAX_RAD
   }
 
   move(dt, kb, map) {

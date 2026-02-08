@@ -1,4 +1,5 @@
 import { dist } from '../math/geometry.js'
+import { WORLD_HEIGHT_RATIO } from '../config/constants.js'
 import { castSceneRays } from '../systems/raycast-system.js'
 import { fillSceneBackground } from './background-renderer.js'
 import { drawRayWall } from './wall-renderer.js'
@@ -31,7 +32,9 @@ export function drawRaycastScene(state) {
   addEntityRays(state, rays, visibleEntities)
 
   rays.sort((a, b) => b.disT - a.disT)
-  const drawOptions = { fov: state.fov, drawMap: state.drawMap }
+  const worldHeight = state.view.height * WORLD_HEIGHT_RATIO
+  const pitchOffset = Math.tan(state.player.pitch) * (worldHeight * 0.5)
+  const drawOptions = { fov: state.fov, drawMap: state.drawMap, pitchOffset }
 
   rays.forEach(rayEntry => {
     if (rayEntry.isSprite) {
