@@ -7,8 +7,8 @@ const imgSrcs = [
 
 imgSrcs.forEach((src, i) => {
   const img = new Image()
+  img.crossOrigin = 'anonymous'
   img.src = src
-  img.setAttribute('crossOrigin', '')
   walls[i] = img
 })
 

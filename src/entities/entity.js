@@ -20,8 +20,8 @@ export class Entity {
         img.onload = () => {
           this.imgRatios.push(img.width / img.height)
         }
+        img.crossOrigin = 'anonymous'
         img.src = srcURL
-        img.setAttribute('crossOrigin', '')
         this.imgs.push(img)
       }
     } else {
@@ -29,8 +29,8 @@ export class Entity {
       this.img.onload = () => {
         this.imgRatio = this.img.width / this.img.height
       }
+      this.img.crossOrigin = 'anonymous'
       this.img.src = src
-      this.img.setAttribute('crossOrigin', '')
     }
   }
 
