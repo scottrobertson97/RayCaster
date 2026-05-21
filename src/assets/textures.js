@@ -6,6 +6,11 @@ const imgSrcs = [
 ]
 
 imgSrcs.forEach((src, i) => {
+  if (!src) {
+    walls[i] = null
+    return
+  }
+
   const img = new Image()
   img.crossOrigin = 'anonymous'
   img.src = src

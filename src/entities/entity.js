@@ -1,6 +1,10 @@
 import { dist } from '../math/geometry.js'
 import { GameMap } from '../map/game-map.js'
 
+function isDrawableImage(image) {
+  return image?.complete && image.naturalWidth > 0 && image.naturalHeight > 0
+}
+
 export class Entity {
   constructor(x, y, size, src, frameRate = 0.5) {
     this.x = x
@@ -92,9 +96,14 @@ export class Entity {
     const cx = percent * view.width - width / 2
 
     if (this.img) {
+      if (!isDrawableImage(this.img)) return
+
       ctx.drawImage(this.img, cx, lineO, width, lineH)
     } else if (this.imgs) {
-      ctx.drawImage(this.imgs[this.frameIndex], cx, lineO, width, lineH)
+      const frame = this.imgs[this.frameIndex]
+      if (!isDrawableImage(frame)) return
+
+      ctx.drawImage(frame, cx, lineO, width, lineH)
       this.frameTick += dt
       if (this.frameTick > this.frameRate) {
         this.frameTick = 0

@@ -4,6 +4,10 @@ import { applyFog, castSceneRay } from '../systems/raycast-system.js'
 
 const DOOR_OPEN_EPSILON = 0.0001
 
+function isDrawableImage(image) {
+  return image?.complete && image.naturalWidth > 0 && image.naturalHeight > 0
+}
+
 function getWallSamplePercent(ray, isVertical, isUp, isLeft) {
   let percentage = 1
 
@@ -63,15 +67,17 @@ export function drawRayWall(state, rayData) {
     return
   }
 
-  if (imgID > 0 && state.walls[imgID]) {
-    const pixelX = Math.trunc(state.walls[imgID].width * percentage)
+  const texture = state.walls[imgID]
+
+  if (imgID > 0 && isDrawableImage(texture)) {
+    const pixelX = Math.trunc(texture.width * percentage)
 
     ctx.drawImage(
-      state.walls[imgID],
+      texture,
       pixelX,
       0,
       1,
-      state.walls[imgID].height,
+      texture.height,
       r * state.horRes,
       lineO,
       state.horRes,

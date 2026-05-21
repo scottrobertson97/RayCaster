@@ -1,5 +1,9 @@
 import { walls as defaultWalls } from '../assets/textures.js'
 
+function isDrawableImage(image) {
+  return image?.complete && image.naturalWidth > 0 && image.naturalHeight > 0
+}
+
 export class GameMap extends Array {
   constructor(m) {
     super(...m)
@@ -26,7 +30,7 @@ export class GameMap extends Array {
           const yo = y * GameMap.size
           const i = this[y][x]
           const texture = textures[i]
-          if (i > 0 && texture) {
+          if (i > 0 && isDrawableImage(texture)) {
             ctx.drawImage(texture, xo, yo, GameMap.size, GameMap.size)
           } else if (i > 0) {
             ctx.fillStyle = 'red'
