@@ -100,7 +100,7 @@ Each backlog item is shaped as an implementation ticket. Acceptance criteria sho
 
 ### ENG-005: Add Input Action Map
 
-**Status:** Backlog
+**Status:** Complete
 
 **Goal:** Let gameplay systems consume named actions like `moveForward`, `turnLeft`, `interact`, and `fire` instead of raw key codes.
 

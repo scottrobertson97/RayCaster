@@ -1,7 +1,6 @@
 import { ASSET_IDS } from '../assets/asset-manifest.js'
 import { Vec2 } from '../math/vec2.js'
 import { LOOK_PITCH_MAX_RAD, LOOK_PITCH_SPEED } from '../config/constants.js'
-import { Keyboard } from '../input/keyboard-state.js'
 import { Bullet } from './bullet.js'
 import { norm } from '../math/geometry.js'
 
@@ -89,10 +88,7 @@ export class Player {
   shoot(kb, spawnBullet) {
     if (!spawnBullet) return
 
-    if (
-      kb.keydown[Keyboard.KEYBOARD.KEY_SPACE] &&
-      !kb.previousKeydown[Keyboard.KEYBOARD.KEY_SPACE]
-    ) {
+    if (kb.actionPressed('fire')) {
       const direction = norm({ x: Math.cos(this.a), y: Math.sin(this.a) })
       spawnBullet(new Bullet(this.x, this.y, direction, 5, ASSET_IDS.sprites.bullet))
     }

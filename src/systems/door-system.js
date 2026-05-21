@@ -8,7 +8,6 @@ import {
   DOOR_UNLOCKED_TILE_ID,
   KEY_RED,
 } from '../config/constants.js'
-import { Keyboard } from '../input/keyboard-state.js'
 import { GameMap } from '../map/game-map.js'
 import { setUiNotice } from './keycard-system.js'
 
@@ -204,9 +203,7 @@ export function initializeDoorsFromMap(state) {
 }
 
 export function handleDoorActivation(state) {
-  const eDown = state.input.keyboard.keydown[Keyboard.KEYBOARD.KEY_E]
-  const eWasDown = state.input.keyboard.previousKeydown[Keyboard.KEYBOARD.KEY_E]
-  if (!eDown || eWasDown) return
+  if (!state.input.keyboard.actionPressed('interact')) return
 
   const targetDoor = getClosestDoorInFront(state)
   if (!targetDoor) return
