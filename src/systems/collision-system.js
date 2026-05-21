@@ -1,8 +1,8 @@
 import { pointInsideAABB } from '../math/geometry.js'
 
 export function resolveBulletCollisions(state) {
-  const { bullets, enemies } = state.entityStore
-  const map = state.map
+  const { bullets, enemies } = state.entities
+  const map = state.world.map
 
   for (let i = bullets.length - 1; i >= 0; i--) {
     const bullet = bullets[i]

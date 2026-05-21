@@ -2,7 +2,7 @@ import { DEFAULT_FOV, DEFAULT_HOR_RES } from '../config/constants.js'
 import { GameMap } from '../map/game-map.js'
 
 export function createGameState({ viewCanvas, mapCanvas, ctx, mapCtx, map, player, keyboard, walls }) {
-  const entityStore = {
+  const entities = {
     bullets: [],
     enemies: [],
     pickups: [],
@@ -12,50 +12,62 @@ export function createGameState({ viewCanvas, mapCanvas, ctx, mapCtx, map, playe
   }
 
   return {
-    canvases: {
-      view: viewCanvas,
-      map: mapCanvas,
-    },
-    ctx,
-    mapCtx,
-    map,
-    player,
-    keyboard,
-    walls,
-    entityStore,
-    doors: {},
-    inventory: {
-      hasRedKeycard: false,
-    },
-    uiNotice: {
-      text: '',
-      timer: 0,
-    },
-    drawMap: false,
-    fogEnabled: false,
-    drawRays: true,
-    fov: DEFAULT_FOV,
-    horRes: DEFAULT_HOR_RES,
-    halfHorRes: DEFAULT_HOR_RES / 2,
-    lastTime: 0,
-    dt: 0,
-    rays: [],
-    fpsCounterBuffer: 0,
-    fpsLast: 0,
-    fog: {
-      START: 3 * GameMap.size,
-      END: 9 * GameMap.size,
-    },
-    view: {
-      get width() {
-        return viewCanvas.width
+    world: {
+      map,
+      player,
+      doors: {},
+      inventory: {
+        hasRedKeycard: false,
       },
-      get height() {
-        return viewCanvas.height
+    },
+    entities,
+    input: {
+      keyboard,
+    },
+    ui: {
+      notice: {
+        text: '',
+        timer: 0,
       },
-      get halfHeight() {
-        return viewCanvas.height / 2
+      fpsCounterBuffer: 0,
+      fpsLast: 0,
+    },
+    assets: {
+      walls,
+    },
+    render: {
+      canvases: {
+        view: viewCanvas,
+        map: mapCanvas,
       },
+      ctx,
+      mapCtx,
+      drawMap: false,
+      fogEnabled: false,
+      drawRays: true,
+      fov: DEFAULT_FOV,
+      horRes: DEFAULT_HOR_RES,
+      halfHorRes: DEFAULT_HOR_RES / 2,
+      rays: [],
+      fog: {
+        START: 3 * GameMap.size,
+        END: 9 * GameMap.size,
+      },
+      view: {
+        get width() {
+          return viewCanvas.width
+        },
+        get height() {
+          return viewCanvas.height
+        },
+        get halfHeight() {
+          return viewCanvas.height / 2
+        },
+      },
+    },
+    runtime: {
+      lastTime: 0,
+      dt: 0,
     },
   }
 }

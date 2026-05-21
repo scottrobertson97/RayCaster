@@ -37,7 +37,7 @@ function getClosedDoorTile(door) {
 
 function hasRequiredKey(state, door) {
   if (!door.requiredKey) return true
-  if (door.requiredKey === KEY_RED) return state.inventory.hasRedKeycard
+  if (door.requiredKey === KEY_RED) return state.world.inventory.hasRedKeycard
   return false
 }
 
@@ -57,19 +57,19 @@ function tryUnlockDoor(state, door) {
 }
 
 function ensureDoorTile(state, door, tileValue) {
-  if (state.map[door.tileY][door.tileX] !== tileValue) {
-    state.map.setTile(door.tileX, door.tileY, tileValue)
+  if (state.world.map[door.tileY][door.tileX] !== tileValue) {
+    state.world.map.setTile(door.tileX, door.tileY, tileValue)
   }
 }
 
 function isDoorBlockedByActors(state, door) {
-  const px = worldToTile(state.player.x)
-  const py = worldToTile(state.player.y)
+  const px = worldToTile(state.world.player.x)
+  const py = worldToTile(state.world.player.y)
   if (px === door.tileX && py === door.tileY) {
     return true
   }
 
-  return state.entityStore.enemies.some(enemy => {
+  return state.entities.enemies.some(enemy => {
     const ex = worldToTile(enemy.x)
     const ey = worldToTile(enemy.y)
     return ex === door.tileX && ey === door.tileY
@@ -77,34 +77,34 @@ function isDoorBlockedByActors(state, door) {
 }
 
 function getClosestDoorInFront(state) {
-  const direction = { x: Math.cos(state.player.a), y: Math.sin(state.player.a) }
+  const direction = { x: Math.cos(state.world.player.a), y: Math.sin(state.world.player.a) }
   const steps = 12
   const stepDistance = DOOR_INTERACT_RANGE / steps
   let closestDoor = null
   let closestDistance = Infinity
 
   for (let i = 1; i <= steps; i++) {
-    const sampleX = state.player.x + direction.x * stepDistance * i
-    const sampleY = state.player.y + direction.y * stepDistance * i
+    const sampleX = state.world.player.x + direction.x * stepDistance * i
+    const sampleY = state.world.player.y + direction.y * stepDistance * i
     const tileX = worldToTile(sampleX)
     const tileY = worldToTile(sampleY)
-    if (tileY < 0 || tileY >= state.map.height || tileX < 0 || tileX >= state.map.width) {
+    if (tileY < 0 || tileY >= state.world.map.height || tileX < 0 || tileX >= state.world.map.width) {
       break
     }
 
-    const sampledTile = state.map[tileY][tileX]
+    const sampledTile = state.world.map[tileY][tileX]
     if (sampledTile > 0 && !isDoorTile(sampledTile)) {
       break
     }
 
     const key = getDoorKey(tileX, tileY)
-    const door = state.doors[key]
+    const door = state.world.doors[key]
     if (!door) continue
 
     const centerX = tileX * GameMap.size + GameMap.size * 0.5
     const centerY = tileY * GameMap.size + GameMap.size * 0.5
-    const dx = centerX - state.player.x
-    const dy = centerY - state.player.y
+    const dx = centerX - state.world.player.x
+    const dy = centerY - state.world.player.y
     const distance = Math.sqrt(dx * dx + dy * dy)
     if (distance > DOOR_INTERACT_RANGE) continue
 
@@ -136,7 +136,7 @@ function activateDoor(state, door) {
 }
 
 function updateDoorOpening(state, door) {
-  door.openAmount = Math.min(door.openAmount + state.dt / DOOR_OPEN_DURATION, 1)
+  door.openAmount = Math.min(door.openAmount + state.runtime.dt / DOOR_OPEN_DURATION, 1)
   if (door.openAmount < DOOR_OPEN_PASSABLE_THRESHOLD - EPSILON) {
     return
   }
@@ -149,7 +149,7 @@ function updateDoorOpening(state, door) {
 
 function updateDoorOpen(state, door) {
   ensureDoorTile(state, door, 0)
-  door.holdTimer -= state.dt
+  door.holdTimer -= state.runtime.dt
   if (door.holdTimer > 0) return
 
   if (isDoorBlockedByActors(state, door)) {
@@ -170,7 +170,7 @@ function updateDoorClosing(state, door) {
     return
   }
 
-  door.openAmount = Math.max(door.openAmount - state.dt / DOOR_CLOSE_DURATION, 0)
+  door.openAmount = Math.max(door.openAmount - state.runtime.dt / DOOR_CLOSE_DURATION, 0)
   if (door.openAmount > EPSILON) {
     return
   }
@@ -182,9 +182,9 @@ function updateDoorClosing(state, door) {
 export function initializeDoorsFromMap(state) {
   const doors = {}
 
-  for (let y = 0; y < state.map.height; y++) {
-    for (let x = 0; x < state.map.width; x++) {
-      const tile = state.map[y][x]
+  for (let y = 0; y < state.world.map.height; y++) {
+    for (let x = 0; x < state.world.map.width; x++) {
+      const tile = state.world.map[y][x]
       if (!isDoorTile(tile)) continue
 
       const key = getDoorKey(x, y)
@@ -200,12 +200,12 @@ export function initializeDoorsFromMap(state) {
     }
   }
 
-  state.doors = doors
+  state.world.doors = doors
 }
 
 export function handleDoorActivation(state) {
-  const eDown = state.keyboard.keydown[Keyboard.KEYBOARD.KEY_E]
-  const eWasDown = state.keyboard.previousKeydown[Keyboard.KEYBOARD.KEY_E]
+  const eDown = state.input.keyboard.keydown[Keyboard.KEYBOARD.KEY_E]
+  const eWasDown = state.input.keyboard.previousKeydown[Keyboard.KEYBOARD.KEY_E]
   if (!eDown || eWasDown) return
 
   const targetDoor = getClosestDoorInFront(state)
@@ -214,7 +214,7 @@ export function handleDoorActivation(state) {
 }
 
 export function updateDoors(state) {
-  Object.values(state.doors).forEach(door => {
+  Object.values(state.world.doors).forEach(door => {
     if (door.phase === 'opening') {
       updateDoorOpening(state, door)
       return

@@ -16,42 +16,42 @@ const RED_KEYCARD_SPRITE = `data:image/svg+xml;charset=utf-8,${encodeURIComponen
 )}`
 
 function clearNotice(state) {
-  state.uiNotice.text = ''
-  state.uiNotice.timer = 0
+  state.ui.notice.text = ''
+  state.ui.notice.timer = 0
 }
 
 function updateNoticeTimer(state) {
-  if (state.uiNotice.timer <= 0) return
-  state.uiNotice.timer -= state.dt
-  if (state.uiNotice.timer <= 0) {
+  if (state.ui.notice.timer <= 0) return
+  state.ui.notice.timer -= state.runtime.dt
+  if (state.ui.notice.timer <= 0) {
     clearNotice(state)
   }
 }
 
 export function setUiNotice(state, text, duration = DEFAULT_NOTICE_DURATION) {
-  state.uiNotice.text = text
-  state.uiNotice.timer = duration
+  state.ui.notice.text = text
+  state.ui.notice.timer = duration
 }
 
 function collectPickup(state, pickup) {
   if (pickup.collected) return
   pickup.collected = true
 
-  if (pickup.pickupType === KEY_RED && !state.inventory.hasRedKeycard) {
-    state.inventory.hasRedKeycard = true
+  if (pickup.pickupType === KEY_RED && !state.world.inventory.hasRedKeycard) {
+    state.world.inventory.hasRedKeycard = true
     setUiNotice(state, 'Picked up red keycard', 1.5)
   }
 }
 
 export function initializeKeycardsFromMap(state) {
-  for (let y = 0; y < state.map.height; y++) {
-    for (let x = 0; x < state.map.width; x++) {
-      if (state.map[y][x] !== KEYCARD_RED_TILE_ID) continue
+  for (let y = 0; y < state.world.map.height; y++) {
+    for (let x = 0; x < state.world.map.width; x++) {
+      if (state.world.map[y][x] !== KEYCARD_RED_TILE_ID) continue
 
       const centerX = x * GameMap.size + GameMap.size * 0.5
       const centerY = y * GameMap.size + GameMap.size * 0.5
-      state.entityStore.pickups.push(new Pickup(centerX, centerY, 10, RED_KEYCARD_SPRITE, KEY_RED))
-      state.map.setTile(x, y, 0)
+      state.entities.pickups.push(new Pickup(centerX, centerY, 10, RED_KEYCARD_SPRITE, KEY_RED))
+      state.world.map.setTile(x, y, 0)
     }
   }
 }
@@ -59,18 +59,18 @@ export function initializeKeycardsFromMap(state) {
 export function updateKeycardPickups(state) {
   updateNoticeTimer(state)
 
-  for (let i = state.entityStore.pickups.length - 1; i >= 0; i--) {
-    const pickup = state.entityStore.pickups[i]
+  for (let i = state.entities.pickups.length - 1; i >= 0; i--) {
+    const pickup = state.entities.pickups[i]
     if (pickup.collected) {
-      state.entityStore.pickups.splice(i, 1)
+      state.entities.pickups.splice(i, 1)
       continue
     }
 
-    const dx = pickup.x - state.player.x
-    const dy = pickup.y - state.player.y
+    const dx = pickup.x - state.world.player.x
+    const dy = pickup.y - state.world.player.y
     if (dx * dx + dy * dy <= PICKUP_RADIUS_SQ) {
       collectPickup(state, pickup)
-      state.entityStore.pickups.splice(i, 1)
+      state.entities.pickups.splice(i, 1)
     }
   }
 }

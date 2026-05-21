@@ -1,5 +1,0 @@
-load map from file
-image tiling on block
-ai movement
-diffrent sprite from diiferent angle
-doors

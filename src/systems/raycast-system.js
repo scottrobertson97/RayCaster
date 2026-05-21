@@ -13,17 +13,17 @@ export function normalizeAngle(angle) {
 
 export function castSceneRays(state, entitiesList) {
   const rays = []
-  const columnCount = state.view.width / state.horRes
-  const angleStep = (state.fov / state.view.width) * state.horRes * DR
-  let rayAngle = normalizeAngle(state.player.a - DR * (state.fov / 2))
+  const columnCount = state.render.view.width / state.render.horRes
+  const angleStep = (state.render.fov / state.render.view.width) * state.render.horRes * DR
+  let rayAngle = normalizeAngle(state.world.player.a - DR * (state.render.fov / 2))
 
   for (let r = 0; r < columnCount; r++) {
     const rayData = castSceneRay(state, rayAngle, r)
     const raySegment = {
       x1: rayData.ray.x,
       y1: rayData.ray.y,
-      x2: state.player.x,
-      y2: state.player.y,
+      x2: state.world.player.x,
+      y2: state.world.player.y,
     }
 
     entitiesList.forEach(entity => {
@@ -43,24 +43,24 @@ export function castSceneRays(state, entitiesList) {
       }
 
       if (lineIntersect(raySegment, diag1) || lineIntersect(raySegment, diag2)) {
-        if (state.drawMap) {
-          state.mapCtx.beginPath()
-          state.mapCtx.moveTo(rayData.ray.x, rayData.ray.y)
-          state.mapCtx.lineTo(state.player.x, state.player.y)
-          state.mapCtx.strokeStyle = 'pink'
-          state.mapCtx.stroke()
+        if (state.render.drawMap) {
+          state.render.mapCtx.beginPath()
+          state.render.mapCtx.moveTo(rayData.ray.x, rayData.ray.y)
+          state.render.mapCtx.lineTo(state.world.player.x, state.world.player.y)
+          state.render.mapCtx.strokeStyle = 'pink'
+          state.render.mapCtx.stroke()
         }
         entity.drawn = true
       }
     })
 
-    if (state.drawRays && state.drawMap && rayData.hit) {
-      state.mapCtx.beginPath()
-      state.mapCtx.moveTo(state.player.x, state.player.y)
-      state.mapCtx.lineTo(rayData.ray.x, rayData.ray.y)
-      state.mapCtx.strokeStyle = 'red'
-      state.mapCtx.lineWidth = 1
-      state.mapCtx.stroke()
+    if (state.render.drawRays && state.render.drawMap && rayData.hit) {
+      state.render.mapCtx.beginPath()
+      state.render.mapCtx.moveTo(state.world.player.x, state.world.player.y)
+      state.render.mapCtx.lineTo(rayData.ray.x, rayData.ray.y)
+      state.render.mapCtx.strokeStyle = 'red'
+      state.render.mapCtx.lineWidth = 1
+      state.render.mapCtx.stroke()
     }
 
     applyFog(state, rayData)
@@ -94,8 +94,8 @@ export function castSceneRay(state, angle, column, ignoreTile = null) {
 }
 
 export function castHorizontalRay(state, angle, ignoreTile = null) {
-  const map = state.map
-  const player = state.player
+  const map = state.world.map
+  const player = state.world.player
 
   let rayX = player.x
   let rayY = player.y
@@ -158,8 +158,8 @@ export function castHorizontalRay(state, angle, ignoreTile = null) {
 }
 
 export function castVerticalRay(state, angle, ignoreTile = null) {
-  const map = state.map
-  const player = state.player
+  const map = state.world.map
+  const player = state.world.player
 
   let rayX = player.x
   let rayY = player.y
@@ -228,17 +228,17 @@ export function castVerticalRay(state, angle, ignoreTile = null) {
 }
 
 export function applyFog(state, rayData) {
-  if (!state.fogEnabled) return
-  if (rayData.hit && rayData.disT <= state.fog.END) return
+  if (!state.render.fogEnabled) return
+  if (rayData.hit && rayData.disT <= state.render.fog.END) return
 
   const rayNorm = norm({
-    x: rayData.ray.x - state.player.x,
-    y: rayData.ray.y - state.player.y,
+    x: rayData.ray.x - state.world.player.x,
+    y: rayData.ray.y - state.world.player.y,
   })
 
-  rayData.ray.x = state.player.x + rayNorm.x * state.fog.END
-  rayData.ray.y = state.player.y + rayNorm.y * state.fog.END
-  rayData.disT = state.fog.END
+  rayData.ray.x = state.world.player.x + rayNorm.x * state.render.fog.END
+  rayData.ray.y = state.world.player.y + rayNorm.y * state.render.fog.END
+  rayData.disT = state.render.fog.END
   rayData.mp = null
   rayData.colorMod = 0
 }
@@ -246,7 +246,7 @@ export function applyFog(state, rayData) {
 export function getFarRayPoint(state, angle) {
   const direction = { x: Math.cos(angle), y: Math.sin(angle) }
   return {
-    x: state.player.x + direction.x * GameMap.size * DOF,
-    y: state.player.y + direction.y * GameMap.size * DOF,
+    x: state.world.player.x + direction.x * GameMap.size * DOF,
+    y: state.world.player.y + direction.y * GameMap.size * DOF,
   }
 }

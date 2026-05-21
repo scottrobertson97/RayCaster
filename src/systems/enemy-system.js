@@ -1,5 +1,5 @@
 import { norm } from '../math/geometry.js'
 
 export function updateEnemies(state) {
-  state.entityStore.enemies.forEach(enemy => enemy.update(state.player, norm, state.map))
+  state.entities.enemies.forEach(enemy => enemy.update(state.world.player, norm, state.world.map))
 }

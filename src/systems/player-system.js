@@ -1,5 +1,5 @@
 export function updatePlayer(state) {
-  state.player.update(state.dt, state.keyboard, state.map, bullet => {
-    state.entityStore.bullets.push(bullet)
+  state.world.player.update(state.runtime.dt, state.input.keyboard, state.world.map, bullet => {
+    state.entities.bullets.push(bullet)
   })
 }

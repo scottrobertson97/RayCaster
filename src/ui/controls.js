@@ -1,17 +1,17 @@
 import { DEFAULT_HOR_RES } from '../config/constants.js'
 
 export function setHorizontalResolution(state, value) {
-  state.horRes = Number(value)
-  state.halfHorRes = state.horRes / 2
+  state.render.horRes = Number(value)
+  state.render.halfHorRes = state.render.horRes / 2
 }
 
 export function toggleMap(state) {
-  state.drawMap = !state.drawMap
-  state.canvases.map.style.display = state.drawMap ? 'block' : 'none'
+  state.render.drawMap = !state.render.drawMap
+  state.render.canvases.map.style.display = state.render.drawMap ? 'block' : 'none'
 }
 
 export function toggleFog(state) {
-  state.fogEnabled = !state.fogEnabled
+  state.render.fogEnabled = !state.render.fogEnabled
 }
 
 export function bindControls(state, root = document) {

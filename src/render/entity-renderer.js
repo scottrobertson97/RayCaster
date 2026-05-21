@@ -8,7 +8,7 @@ function addEntityRays(state, rays, entitiesList) {
   entitiesList.forEach((entity, index) => {
     if (entity.drawn) {
       rays.push({
-        disT: dist(entity.x, entity.y, state.player.x, state.player.y),
+        disT: dist(entity.x, entity.y, state.world.player.x, state.world.player.y),
         isSprite: true,
         index,
       })
@@ -17,13 +17,13 @@ function addEntityRays(state, rays, entitiesList) {
 }
 
 export function drawEntities2D(state) {
-  state.entityStore.getEntities().forEach(entity => entity.draw2D(state.mapCtx, state.drawMap))
+  state.entities.getEntities().forEach(entity => entity.draw2D(state.render.mapCtx, state.render.drawMap))
 }
 
 export function drawRaycastScene(state) {
   fillSceneBackground(state)
 
-  const visibleEntities = state.entityStore.getEntities()
+  const visibleEntities = state.entities.getEntities()
   visibleEntities.forEach(entity => {
     entity.drawn = false
   })
@@ -32,18 +32,18 @@ export function drawRaycastScene(state) {
   addEntityRays(state, rays, visibleEntities)
 
   rays.sort((a, b) => b.disT - a.disT)
-  const worldHeight = state.view.height * WORLD_HEIGHT_RATIO
-  const pitchOffset = Math.tan(state.player.pitch) * (worldHeight * 0.5)
-  const drawOptions = { fov: state.fov, drawMap: state.drawMap, pitchOffset }
+  const worldHeight = state.render.view.height * WORLD_HEIGHT_RATIO
+  const pitchOffset = Math.tan(state.world.player.pitch) * (worldHeight * 0.5)
+  const drawOptions = { fov: state.render.fov, drawMap: state.render.drawMap, pitchOffset }
 
   rays.forEach(rayEntry => {
     if (rayEntry.isSprite) {
       visibleEntities[rayEntry.index].draw(
-        state.dt,
-        state.player,
-        state.ctx,
-        state.mapCtx,
-        state.view,
+        state.runtime.dt,
+        state.world.player,
+        state.render.ctx,
+        state.render.mapCtx,
+        state.render.view,
         drawOptions
       )
     } else {
@@ -51,5 +51,5 @@ export function drawRaycastScene(state) {
     }
   })
 
-  state.rays = rays
+  state.render.rays = rays
 }

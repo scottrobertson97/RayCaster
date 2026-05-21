@@ -8,53 +8,53 @@ import {
 } from '../config/constants.js'
 
 export function drawUI(state) {
-  const uiTop = state.view.height * WORLD_HEIGHT_RATIO
+  const uiTop = state.render.view.height * WORLD_HEIGHT_RATIO
   const hudFontSize = Math.min(FONT_SIZE, 20)
   const hudLineStep = hudFontSize + 4
 
-  state.ctx.fillStyle = 'green'
-  state.ctx.fillRect(0, uiTop, state.view.width, state.view.height * 0.25)
+  state.render.ctx.fillStyle = 'green'
+  state.render.ctx.fillRect(0, uiTop, state.render.view.width, state.render.view.height * 0.25)
 
-  state.ctx.beginPath()
-  state.ctx.moveTo(state.view.width * 0.5, state.view.halfHeight * WORLD_HEIGHT_RATIO - CROSSHAIR_SPACE - CROSSHAIR_WIDTH)
-  state.ctx.lineTo(state.view.width * 0.5, state.view.halfHeight * WORLD_HEIGHT_RATIO - CROSSHAIR_SPACE)
+  state.render.ctx.beginPath()
+  state.render.ctx.moveTo(state.render.view.width * 0.5, state.render.view.halfHeight * WORLD_HEIGHT_RATIO - CROSSHAIR_SPACE - CROSSHAIR_WIDTH)
+  state.render.ctx.lineTo(state.render.view.width * 0.5, state.render.view.halfHeight * WORLD_HEIGHT_RATIO - CROSSHAIR_SPACE)
 
-  state.ctx.moveTo(state.view.width * 0.5, state.view.halfHeight * WORLD_HEIGHT_RATIO + CROSSHAIR_SPACE + CROSSHAIR_WIDTH)
-  state.ctx.lineTo(state.view.width * 0.5, state.view.halfHeight * WORLD_HEIGHT_RATIO + CROSSHAIR_SPACE)
+  state.render.ctx.moveTo(state.render.view.width * 0.5, state.render.view.halfHeight * WORLD_HEIGHT_RATIO + CROSSHAIR_SPACE + CROSSHAIR_WIDTH)
+  state.render.ctx.lineTo(state.render.view.width * 0.5, state.render.view.halfHeight * WORLD_HEIGHT_RATIO + CROSSHAIR_SPACE)
 
-  state.ctx.moveTo(state.view.width * 0.5 - CROSSHAIR_SPACE - CROSSHAIR_WIDTH, state.view.halfHeight * WORLD_HEIGHT_RATIO)
-  state.ctx.lineTo(state.view.width * 0.5 - CROSSHAIR_SPACE, state.view.halfHeight * WORLD_HEIGHT_RATIO)
+  state.render.ctx.moveTo(state.render.view.width * 0.5 - CROSSHAIR_SPACE - CROSSHAIR_WIDTH, state.render.view.halfHeight * WORLD_HEIGHT_RATIO)
+  state.render.ctx.lineTo(state.render.view.width * 0.5 - CROSSHAIR_SPACE, state.render.view.halfHeight * WORLD_HEIGHT_RATIO)
 
-  state.ctx.moveTo(state.view.width * 0.5 + CROSSHAIR_SPACE + CROSSHAIR_WIDTH, state.view.halfHeight * WORLD_HEIGHT_RATIO)
-  state.ctx.lineTo(state.view.width * 0.5 + CROSSHAIR_SPACE, state.view.halfHeight * WORLD_HEIGHT_RATIO)
+  state.render.ctx.moveTo(state.render.view.width * 0.5 + CROSSHAIR_SPACE + CROSSHAIR_WIDTH, state.render.view.halfHeight * WORLD_HEIGHT_RATIO)
+  state.render.ctx.lineTo(state.render.view.width * 0.5 + CROSSHAIR_SPACE, state.render.view.halfHeight * WORLD_HEIGHT_RATIO)
 
-  state.ctx.strokeStyle = 'green'
-  state.ctx.lineWidth = CROSSHAIR_LINE_WIDTH
-  state.ctx.stroke()
+  state.render.ctx.strokeStyle = 'green'
+  state.render.ctx.lineWidth = CROSSHAIR_LINE_WIDTH
+  state.render.ctx.stroke()
 
-  state.ctx.fillStyle = 'black'
-  state.ctx.font = `${hudFontSize}px Arial`
-  state.ctx.fillText('WASD or Arrow Keys to move', 10, uiTop + hudLineStep * 1)
-  state.ctx.fillText('SPACE to shoot', 10, uiTop + hudLineStep * 2)
-  state.ctx.fillText('E to open/close doors', 10, uiTop + hudLineStep * 3)
-  state.ctx.fillText('R/F to look up/down', 10, uiTop + hudLineStep * 4)
-  state.ctx.fillText(
-    `Red keycard: ${state.inventory.hasRedKeycard ? 'YES' : 'NO'}`,
+  state.render.ctx.fillStyle = 'black'
+  state.render.ctx.font = `${hudFontSize}px Arial`
+  state.render.ctx.fillText('WASD or Arrow Keys to move', 10, uiTop + hudLineStep * 1)
+  state.render.ctx.fillText('SPACE to shoot', 10, uiTop + hudLineStep * 2)
+  state.render.ctx.fillText('E to open/close doors', 10, uiTop + hudLineStep * 3)
+  state.render.ctx.fillText('R/F to look up/down', 10, uiTop + hudLineStep * 4)
+  state.render.ctx.fillText(
+    `Red keycard: ${state.world.inventory.hasRedKeycard ? 'YES' : 'NO'}`,
     10,
     uiTop + hudLineStep * 5
   )
 
-  if (state.uiNotice.timer > 0 && state.uiNotice.text) {
-    state.ctx.fillStyle = '#aa0000'
-    state.ctx.fillText(state.uiNotice.text, state.view.width * 0.45, uiTop + hudLineStep * 1)
-    state.ctx.fillStyle = 'black'
+  if (state.ui.notice.timer > 0 && state.ui.notice.text) {
+    state.render.ctx.fillStyle = '#aa0000'
+    state.render.ctx.fillText(state.ui.notice.text, state.render.view.width * 0.45, uiTop + hudLineStep * 1)
+    state.render.ctx.fillStyle = 'black'
   }
 
-  state.fpsCounterBuffer += state.dt
-  if (state.fpsCounterBuffer > FPS_UPDATE_INTERVAL) {
-    state.fpsCounterBuffer = 0
-    state.fpsLast = Math.trunc(1 / state.dt)
+  state.ui.fpsCounterBuffer += state.runtime.dt
+  if (state.ui.fpsCounterBuffer > FPS_UPDATE_INTERVAL) {
+    state.ui.fpsCounterBuffer = 0
+    state.ui.fpsLast = Math.trunc(1 / state.runtime.dt)
   }
 
-  state.ctx.fillText(`${state.fpsLast} fps`, 10, uiTop + hudLineStep * 6)
+  state.render.ctx.fillText(`${state.ui.fpsLast} fps`, 10, uiTop + hudLineStep * 6)
 }

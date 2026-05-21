@@ -34,13 +34,13 @@ function drawBehindDoorRay(state, rayData) {
 
 export function drawRayWall(state, rayData) {
   const { ray, mp, isVertical, isUp, isLeft, r, colorMod } = rayData
-  const ctx = state.ctx
+  const ctx = state.render.ctx
 
-  const worldHeight = state.view.height * WORLD_HEIGHT_RATIO
-  const pitchOffsetPx = Math.tan(state.player.pitch) * (worldHeight * 0.5)
+  const worldHeight = state.render.view.height * WORLD_HEIGHT_RATIO
+  const pitchOffsetPx = Math.tan(state.world.player.pitch) * (worldHeight * 0.5)
 
   let disT = rayData.disT
-  const ca = state.player.a - ray.a
+  const ca = state.world.player.a - ray.a
 
   disT *= Math.cos(ca)
   const lineH = Math.trunc((GameMap.size * worldHeight) / disT)
@@ -48,26 +48,26 @@ export function drawRayWall(state, rayData) {
 
   if (!mp) {
     ctx.beginPath()
-    ctx.moveTo(r * state.horRes + state.halfHorRes, lineO)
-    ctx.lineTo(r * state.horRes + state.halfHorRes, lineH + lineO)
+    ctx.moveTo(r * state.render.horRes + state.render.halfHorRes, lineO)
+    ctx.lineTo(r * state.render.horRes + state.render.halfHorRes, lineH + lineO)
     ctx.strokeStyle = 'white'
-    ctx.lineWidth = state.horRes
+    ctx.lineWidth = state.render.horRes
     ctx.stroke()
     return
   }
 
   const x = mp.x
   const y = mp.y
-  const imgID = state.map[y][x]
+  const imgID = state.world.map[y][x]
   const percentage = getWallSamplePercent(ray, isVertical, isUp, isLeft)
-  const door = state.doors?.[`${x},${y}`]
+  const door = state.world.doors?.[`${x},${y}`]
 
   if (door && door.openAmount > DOOR_OPEN_EPSILON && percentage < door.openAmount) {
     drawBehindDoorRay(state, rayData)
     return
   }
 
-  const texture = state.walls[imgID]
+  const texture = state.assets.walls[imgID]
 
   if (imgID > 0 && isDrawableImage(texture)) {
     const pixelX = Math.trunc(texture.width * percentage)
@@ -78,23 +78,23 @@ export function drawRayWall(state, rayData) {
       0,
       1,
       texture.height,
-      r * state.horRes,
+      r * state.render.horRes,
       lineO,
-      state.horRes,
+      state.render.horRes,
       lineH
     )
 
     ctx.globalAlpha =
-      1 - Math.min(Math.min(lineH, state.view.height) / state.view.height + 0.3, 1) * colorMod
+      1 - Math.min(Math.min(lineH, state.render.view.height) / state.render.view.height + 0.3, 1) * colorMod
     ctx.fillStyle = 'black'
-    ctx.fillRect(r * state.horRes, lineO, state.horRes, lineH)
+    ctx.fillRect(r * state.render.horRes, lineO, state.render.horRes, lineH)
     ctx.globalAlpha = 1
   } else if (imgID > 0) {
     ctx.beginPath()
-    ctx.moveTo(r * state.horRes + state.halfHorRes, lineO)
-    ctx.lineTo(r * state.horRes + state.halfHorRes, lineH + lineO)
-    ctx.strokeStyle = `rgb(${Math.min(Math.min(lineH, state.view.height) / state.view.height + 0.2, 1) * 200 * colorMod},0,0)`
-    ctx.lineWidth = state.horRes
+    ctx.moveTo(r * state.render.horRes + state.render.halfHorRes, lineO)
+    ctx.lineTo(r * state.render.horRes + state.render.halfHorRes, lineH + lineO)
+    ctx.strokeStyle = `rgb(${Math.min(Math.min(lineH, state.render.view.height) / state.render.view.height + 0.2, 1) * 200 * colorMod},0,0)`
+    ctx.lineWidth = state.render.horRes
     ctx.stroke()
   }
 }

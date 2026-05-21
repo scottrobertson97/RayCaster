@@ -8,7 +8,7 @@ Each backlog item is shaped as an implementation ticket. Acceptance criteria sho
 
 ### ENG-001: Split Bootstrap From Engine Runtime
 
-**Status:** Backlog
+**Status:** Complete
 
 **Goal:** Keep `src/main.js` focused on wiring one game instance while reusable startup and runtime coordination move into engine-owned modules.
 
@@ -31,7 +31,7 @@ Each backlog item is shaped as an implementation ticket. Acceptance criteria sho
 
 ### ENG-002: Introduce `Game` or `Engine` Runtime Object
 
-**Status:** Backlog
+**Status:** Complete
 
 **Goal:** Add a runtime object that owns state, update systems, render systems, lifecycle start/stop, and frame ordering.
 
@@ -54,7 +54,7 @@ Each backlog item is shaped as an implementation ticket. Acceptance criteria sho
 
 ### ENG-003: Replace Ad Hoc Global State With Explicit State Slices
 
-**Status:** Backlog
+**Status:** Complete
 
 **Goal:** Reshape game state into named slices for world, entities, rendering, input, UI, assets, and runtime timing.
 
@@ -77,7 +77,7 @@ Each backlog item is shaped as an implementation ticket. Acceptance criteria sho
 
 ### ENG-004: Add Ordered System Registry
 
-**Status:** Backlog
+**Status:** Complete
 
 **Goal:** Create a registry or pipeline so update and render systems can be registered in order instead of hardcoding every system call in `main.js`.
 
