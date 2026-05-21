@@ -8,7 +8,7 @@ export class Bullet extends Entity {
         ? norm(direction)
         : { x: Math.cos(0), y: Math.sin(0) }
 
-    super(x + dir.x * 20, y + dir.y * 20, size, src)
+    super(x + dir.x * 20, y + dir.y * 20, size, src, 0.5, { height: 0.4 })
     this.speed = 5
     this.direction = dir
     this.isAlive = true
@@ -31,10 +31,4 @@ export class Bullet extends Entity {
     }
   }
 
-  draw(dt, player, ctx, mapCtx, view, options = {}) {
-    super.draw(dt, player, ctx, mapCtx, view, {
-      ...options,
-      height: 0.4,
-    })
-  }
 }

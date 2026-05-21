@@ -123,7 +123,7 @@ Each backlog item is shaped as an implementation ticket. Acceptance criteria sho
 
 ### ENG-006: Move Hardcoded Entity Spawning Into Level Data
 
-**Status:** Backlog
+**Status:** Complete
 
 **Goal:** Move current enemy and decorative entity spawning out of `src/main.js` into level data or a level loader.
 
@@ -169,7 +169,7 @@ Each backlog item is shaped as an implementation ticket. Acceptance criteria sho
 
 ### ENG-008: Separate Simulation Entities From Renderable Sprite Data
 
-**Status:** Backlog
+**Status:** Complete
 
 **Goal:** Decouple entity logic from image loading and canvas drawing.
 

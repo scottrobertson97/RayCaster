@@ -2,11 +2,12 @@ import { dist } from '../math/geometry.js'
 import { WORLD_HEIGHT_RATIO } from '../config/constants.js'
 import { castSceneRays } from '../systems/raycast-system.js'
 import { fillSceneBackground } from './background-renderer.js'
+import { drawSpriteEntity, drawSpriteEntity2D } from './sprite-renderer.js'
 import { drawRayWall } from './wall-renderer.js'
 
 function addEntityRays(state, rays, entitiesList) {
   entitiesList.forEach((entity, index) => {
-    if (entity.drawn) {
+    if (entity.sprite?.visible) {
       rays.push({
         disT: dist(entity.x, entity.y, state.world.player.x, state.world.player.y),
         isSprite: true,
@@ -17,7 +18,7 @@ function addEntityRays(state, rays, entitiesList) {
 }
 
 export function drawEntities2D(state) {
-  state.entities.getEntities().forEach(entity => entity.draw2D(state.render.mapCtx, state.render.drawMap))
+  state.entities.getEntities().forEach(entity => drawSpriteEntity2D(entity, state))
 }
 
 export function drawRaycastScene(state) {
@@ -25,7 +26,9 @@ export function drawRaycastScene(state) {
 
   const visibleEntities = state.entities.getEntities()
   visibleEntities.forEach(entity => {
-    entity.drawn = false
+    if (entity.sprite) {
+      entity.sprite.visible = false
+    }
   })
 
   const rays = castSceneRays(state, visibleEntities)
@@ -38,14 +41,7 @@ export function drawRaycastScene(state) {
 
   rays.forEach(rayEntry => {
     if (rayEntry.isSprite) {
-      visibleEntities[rayEntry.index].draw(
-        state.runtime.dt,
-        state.world.player,
-        state.render.ctx,
-        state.render.mapCtx,
-        state.render.view,
-        drawOptions
-      )
+      drawSpriteEntity(visibleEntities[rayEntry.index], state, drawOptions)
     } else {
       drawRayWall(state, rayEntry)
     }

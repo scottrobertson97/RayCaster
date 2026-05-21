@@ -27,7 +27,7 @@ export function castSceneRays(state, entitiesList) {
     }
 
     entitiesList.forEach(entity => {
-      if (entity.drawn) return
+      if (entity.sprite?.visible) return
 
       const diag1 = {
         x1: entity.x - entity.size,
@@ -50,7 +50,7 @@ export function castSceneRays(state, entitiesList) {
           state.render.mapCtx.strokeStyle = 'pink'
           state.render.mapCtx.stroke()
         }
-        entity.drawn = true
+        entity.sprite.visible = true
       }
     })
 
