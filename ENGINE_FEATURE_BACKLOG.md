@@ -146,7 +146,7 @@ Each backlog item is shaped as an implementation ticket. Acceptance criteria sho
 
 ### ENG-007: Define Asset Manifest Layer
 
-**Status:** Backlog
+**Status:** Complete
 
 **Goal:** Introduce stable asset IDs for walls, sprites, pickups, bullets, and UI assets instead of direct URLs inside gameplay classes.
 

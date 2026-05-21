@@ -1,3 +1,4 @@
+import { ASSET_IDS } from '../assets/asset-manifest.js'
 import { KEYCARD_RED_TILE_ID, KEY_RED } from '../config/constants.js'
 import { Pickup } from '../entities/pickup.js'
 import { GameMap } from '../map/game-map.js'
@@ -5,15 +6,6 @@ import { GameMap } from '../map/game-map.js'
 const PICKUP_RADIUS = GameMap.size * 0.35
 const PICKUP_RADIUS_SQ = PICKUP_RADIUS * PICKUP_RADIUS
 const DEFAULT_NOTICE_DURATION = 1.25
-
-const RED_KEYCARD_SPRITE = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(
-  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 40">
-    <rect x="1" y="1" width="62" height="38" rx="6" fill="#b61212" stroke="#ffe1e1" stroke-width="2"/>
-    <rect x="9" y="9" width="22" height="8" rx="2" fill="#ffe1e1"/>
-    <circle cx="49" cy="20" r="6" fill="#ffe1e1"/>
-    <rect x="41" y="28" width="16" height="4" rx="2" fill="#ffe1e1"/>
-  </svg>`
-)}`
 
 function clearNotice(state) {
   state.ui.notice.text = ''
@@ -50,7 +42,7 @@ export function initializeKeycardsFromMap(state) {
 
       const centerX = x * GameMap.size + GameMap.size * 0.5
       const centerY = y * GameMap.size + GameMap.size * 0.5
-      state.entities.pickups.push(new Pickup(centerX, centerY, 10, RED_KEYCARD_SPRITE, KEY_RED))
+      state.entities.pickups.push(new Pickup(centerX, centerY, 10, ASSET_IDS.sprites.redKeycard, KEY_RED))
       state.world.map.setTile(x, y, 0)
     }
   }

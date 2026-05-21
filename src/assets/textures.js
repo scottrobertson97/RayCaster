@@ -1,20 +1,5 @@
-const walls = []
-const imgSrcs = [
-  '',
-  'https://i.imgur.com/7B86fSv.png',
-  'https://i.imgur.com/vSDbzMX.png',
-]
+import { createWallTextureArray } from './asset-manifest.js'
 
-imgSrcs.forEach((src, i) => {
-  if (!src) {
-    walls[i] = null
-    return
-  }
-
-  const img = new Image()
-  img.crossOrigin = 'anonymous'
-  img.src = src
-  walls[i] = img
-})
+const walls = createWallTextureArray()
 
 export { walls }

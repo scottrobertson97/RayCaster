@@ -1,3 +1,4 @@
+import { ASSET_IDS } from './assets/asset-manifest.js'
 import { walls } from './assets/textures.js'
 import { mapMatrix } from './data/map-matrix.js'
 import { Entity } from './entities/entity.js'
@@ -30,13 +31,13 @@ function init() {
 function createInitialEntities() {
   return {
     enemies: [
-      new Enemy(600, 450, 10, 'https://i.imgur.com/FcIXhVp.png'),
+      new Enemy(600, 450, 10, ASSET_IDS.sprites.enemyGuard),
       new Enemy(200, 700, 10, [
-        'https://i.imgur.com/rAFkpSc.png',
-        'https://i.imgur.com/rYCrqax.png',
-        'https://i.imgur.com/p5w5cCU.png',
+        ASSET_IDS.sprites.enemyWalk1,
+        ASSET_IDS.sprites.enemyWalk2,
+        ASSET_IDS.sprites.enemyWalk3,
       ]),
-      new Entity(600, 750, 40, 'https://i.imgur.com/rgwwS0K.png'),
+      new Entity(600, 750, 40, ASSET_IDS.sprites.decoration),
     ],
   }
 }

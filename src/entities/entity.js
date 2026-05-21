@@ -1,3 +1,4 @@
+import { createImageAsset } from '../assets/asset-manifest.js'
 import { dist } from '../math/geometry.js'
 import { GameMap } from '../map/game-map.js'
 
@@ -6,7 +7,7 @@ function isDrawableImage(image) {
 }
 
 export class Entity {
-  constructor(x, y, size, src, frameRate = 0.5) {
+  constructor(x, y, size, assetRef, frameRate = 0.5) {
     this.x = x
     this.y = y
     this.size = size
@@ -16,25 +17,21 @@ export class Entity {
     this.frameRate = frameRate
     this.frameTick = 0
 
-    if (Array.isArray(src)) {
+    if (Array.isArray(assetRef)) {
       this.imgs = []
       this.imgRatios = []
-      for (const srcURL of src) {
-        const img = new Image()
+      for (const frameRef of assetRef) {
+        const img = createImageAsset(frameRef)
         img.onload = () => {
           this.imgRatios.push(img.width / img.height)
         }
-        img.crossOrigin = 'anonymous'
-        img.src = srcURL
         this.imgs.push(img)
       }
     } else {
-      this.img = new Image()
+      this.img = createImageAsset(assetRef)
       this.img.onload = () => {
         this.imgRatio = this.img.width / this.img.height
       }
-      this.img.crossOrigin = 'anonymous'
-      this.img.src = src
     }
   }
 

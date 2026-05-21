@@ -1,3 +1,4 @@
+import { ASSET_IDS } from '../assets/asset-manifest.js'
 import { Vec2 } from '../math/vec2.js'
 import { LOOK_PITCH_MAX_RAD, LOOK_PITCH_SPEED } from '../config/constants.js'
 import { Keyboard } from '../input/keyboard-state.js'
@@ -93,7 +94,7 @@ export class Player {
       !kb.previousKeydown[Keyboard.KEYBOARD.KEY_SPACE]
     ) {
       const direction = norm({ x: Math.cos(this.a), y: Math.sin(this.a) })
-      spawnBullet(new Bullet(this.x, this.y, direction, 5, 'https://i.imgur.com/xrYTZhD.png'))
+      spawnBullet(new Bullet(this.x, this.y, direction, 5, ASSET_IDS.sprites.bullet))
     }
   }
 
