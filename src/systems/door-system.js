@@ -5,6 +5,7 @@ import {
   DOOR_OPEN_DURATION,
   DOOR_OPEN_PASSABLE_THRESHOLD,
   DOOR_UNLOCKED_TILE_ID,
+  KEY_GREEN,
   KEY_RED,
 } from '../config/constants.js'
 import { getTileDefinition, isDoorTileId, isSolidTileId } from '../data/tile-definitions.js'
@@ -25,6 +26,7 @@ function getClosedDoorTile(door) {
 function hasRequiredKey(state, door) {
   if (!door.requiredKey) return true
   if (door.requiredKey === KEY_RED) return state.world.inventory.hasRedKeycard
+  if (door.requiredKey === KEY_GREEN) return state.world.inventory.hasGreenKeycard
   return false
 }
 
@@ -33,6 +35,9 @@ function tryUnlockDoor(state, door) {
   if (!hasRequiredKey(state, door)) {
     if (door.requiredKey === KEY_RED) {
       setUiNotice(state, 'Red keycard required')
+    }
+    if (door.requiredKey === KEY_GREEN) {
+      setUiNotice(state, 'Green keycard required')
     }
     return false
   }

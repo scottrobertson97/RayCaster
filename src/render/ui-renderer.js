@@ -43,6 +43,11 @@ export function drawUI(state) {
     10,
     uiTop + hudLineStep * 5
   )
+  state.render.ctx.fillText(
+    `Green keycard: ${state.world.inventory.hasGreenKeycard ? 'YES' : 'NO'}`,
+    10,
+    uiTop + hudLineStep * 6
+  )
 
   if (state.ui.notice.timer > 0 && state.ui.notice.text) {
     state.render.ctx.fillStyle = '#aa0000'
@@ -56,5 +61,5 @@ export function drawUI(state) {
     state.ui.fpsLast = Math.trunc(1 / state.runtime.dt)
   }
 
-  state.render.ctx.fillText(`${state.ui.fpsLast} fps`, 10, uiTop + hudLineStep * 6)
+  state.render.ctx.fillText(`${state.ui.fpsLast} fps`, 10, uiTop + hudLineStep * 7)
 }

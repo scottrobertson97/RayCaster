@@ -11,6 +11,7 @@ export const ASSET_IDS = {
     decoration: 'sprite.decoration.greenArmor',
     bullet: 'sprite.projectile.bullet',
     redKeycard: 'sprite.pickup.redKeycard',
+    greenKeycard: 'sprite.pickup.greenKeycard',
   },
 }
 
@@ -19,6 +20,13 @@ const redKeycardSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 4
   <rect x="9" y="9" width="22" height="8" rx="2" fill="#ffe1e1"/>
   <circle cx="49" cy="20" r="6" fill="#ffe1e1"/>
   <rect x="41" y="28" width="16" height="4" rx="2" fill="#ffe1e1"/>
+</svg>`
+
+const greenKeycardSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 40">
+  <rect x="1" y="1" width="62" height="38" rx="6" fill="#168a2f" stroke="#e3ffe9" stroke-width="2"/>
+  <rect x="9" y="9" width="22" height="8" rx="2" fill="#e3ffe9"/>
+  <circle cx="49" cy="20" r="6" fill="#e3ffe9"/>
+  <rect x="41" y="28" width="16" height="4" rx="2" fill="#e3ffe9"/>
 </svg>`
 
 const missingAssetSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
@@ -37,6 +45,7 @@ export const assetManifest = {
     [ASSET_IDS.sprites.decoration]: 'https://i.imgur.com/rgwwS0K.png',
     [ASSET_IDS.sprites.bullet]: 'https://i.imgur.com/xrYTZhD.png',
     [ASSET_IDS.sprites.redKeycard]: svgToDataUrl(redKeycardSvg),
+    [ASSET_IDS.sprites.greenKeycard]: svgToDataUrl(greenKeycardSvg),
   },
   wallTextures: {
     1: ASSET_IDS.walls.stone,

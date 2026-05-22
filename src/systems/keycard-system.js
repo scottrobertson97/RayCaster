@@ -1,4 +1,4 @@
-import { KEY_RED } from '../config/constants.js'
+import { KEY_GREEN, KEY_RED } from '../config/constants.js'
 import { getTileDefinition, isPickupSpawnTileId } from '../data/tile-definitions.js'
 import { Pickup } from '../entities/pickup.js'
 import { GameMap } from '../map/game-map.js'
@@ -33,6 +33,11 @@ function collectPickup(state, pickup) {
   if (pickup.pickupType === KEY_RED && !state.world.inventory.hasRedKeycard) {
     state.world.inventory.hasRedKeycard = true
     setUiNotice(state, 'Picked up red keycard', 1.5)
+  }
+
+  if (pickup.pickupType === KEY_GREEN && !state.world.inventory.hasGreenKeycard) {
+    state.world.inventory.hasGreenKeycard = true
+    setUiNotice(state, 'Picked up green keycard', 1.5)
   }
 }
 

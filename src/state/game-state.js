@@ -18,6 +18,7 @@ export function createGameState({ viewCanvas, mapCanvas, ctx, mapCtx, map, playe
       doors: {},
       inventory: {
         hasRedKeycard: false,
+        hasGreenKeycard: false,
       },
     },
     entities,

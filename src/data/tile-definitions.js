@@ -1,8 +1,11 @@
 import { ASSET_IDS } from '../assets/asset-manifest.js'
 import {
+  DOOR_LOCKED_GREEN_TILE_ID,
   DOOR_LOCKED_RED_TILE_ID,
   DOOR_UNLOCKED_TILE_ID,
+  KEY_GREEN,
   KEY_RED,
+  KEYCARD_GREEN_TILE_ID,
   KEYCARD_RED_TILE_ID,
 } from '../config/constants.js'
 
@@ -13,6 +16,8 @@ export const TILE_IDS = {
   unlockedDoor: DOOR_UNLOCKED_TILE_ID,
   lockedRedDoor: DOOR_LOCKED_RED_TILE_ID,
   redKeycardSpawn: KEYCARD_RED_TILE_ID,
+  greenKeycardSpawn: KEYCARD_GREEN_TILE_ID,
+  lockedGreenDoor: DOOR_LOCKED_GREEN_TILE_ID,
 }
 
 export const tileDefinitions = {
@@ -50,12 +55,29 @@ export const tileDefinitions = {
     closedTileId: TILE_IDS.lockedRedDoor,
     unlockedTileId: TILE_IDS.unlockedDoor,
   },
+  [TILE_IDS.lockedGreenDoor]: {
+    id: TILE_IDS.lockedGreenDoor,
+    type: 'door',
+    solid: true,
+    locked: true,
+    requiredKey: KEY_GREEN,
+    closedTileId: TILE_IDS.lockedGreenDoor,
+    unlockedTileId: TILE_IDS.unlockedDoor,
+  },
   [TILE_IDS.redKeycardSpawn]: {
     id: TILE_IDS.redKeycardSpawn,
     type: 'pickupSpawn',
     solid: false,
     pickupType: KEY_RED,
     asset: ASSET_IDS.sprites.redKeycard,
+    clearTileId: TILE_IDS.empty,
+  },
+  [TILE_IDS.greenKeycardSpawn]: {
+    id: TILE_IDS.greenKeycardSpawn,
+    type: 'pickupSpawn',
+    solid: false,
+    pickupType: KEY_GREEN,
+    asset: ASSET_IDS.sprites.greenKeycard,
     clearTileId: TILE_IDS.empty,
   },
 }

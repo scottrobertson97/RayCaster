@@ -20,7 +20,10 @@ export const FONT_SIZE = 30
 export const DOOR_UNLOCKED_TILE_ID = 3
 export const DOOR_LOCKED_RED_TILE_ID = 4
 export const KEYCARD_RED_TILE_ID = 5
+export const KEYCARD_GREEN_TILE_ID = 6
+export const DOOR_LOCKED_GREEN_TILE_ID = 7
 export const KEY_RED = 'red'
+export const KEY_GREEN = 'green'
 
 // Backward-compatible alias for existing door logic.
 export const DOOR_TILE_ID = DOOR_UNLOCKED_TILE_ID
