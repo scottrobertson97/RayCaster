@@ -1,4 +1,6 @@
+import { isSolidTileId } from '../data/tile-definitions.js'
 import { pointInsideAABB } from '../math/geometry.js'
+import { worldToTile } from '../math/tile-coordinates.js'
 
 export function resolveBulletCollisions(state) {
   const { bullets, enemies } = state.entities
@@ -11,8 +13,8 @@ export function resolveBulletCollisions(state) {
       continue
     }
 
-    const bulletTileX = Math.trunc(bullet.x) >> 6
-    const bulletTileY = Math.trunc(bullet.y) >> 6
+    const bulletTileX = worldToTile(bullet.x)
+    const bulletTileY = worldToTile(bullet.y)
 
     if (
       bulletTileY < 0 ||
@@ -24,7 +26,7 @@ export function resolveBulletCollisions(state) {
       continue
     }
 
-    if (map[bulletTileY][bulletTileX] > 0) {
+    if (isSolidTileId(map[bulletTileY][bulletTileX])) {
       bullets.splice(i, 1)
       continue
     }

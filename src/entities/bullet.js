@@ -1,5 +1,7 @@
 import { Entity } from './entity.js'
+import { isSolidTileId } from '../data/tile-definitions.js'
 import { norm } from '../math/geometry.js'
+import { worldToTile } from '../math/tile-coordinates.js'
 
 export class Bullet extends Entity {
   constructor(x, y, direction, size, src) {
@@ -18,14 +20,14 @@ export class Bullet extends Entity {
     this.x += this.direction.x * this.speed
     this.y += this.direction.y * this.speed
 
-    const newX = Math.trunc(this.x) >> 6
-    const newY = Math.trunc(this.y) >> 6
+    const newX = worldToTile(this.x)
+    const newY = worldToTile(this.y)
     if (
       newY < 0 ||
       newY >= map.length ||
       newX < 0 ||
       newX >= map[0].length ||
-      map[newY][newX] > 0
+      isSolidTileId(map[newY][newX])
     ) {
       this.isAlive = false
     }

@@ -45,10 +45,10 @@ export function norm(vec) {
   return { x: vec.x / mag, y: vec.y / mag }
 }
 
+import { tileToWorld, worldToTile } from './tile-coordinates.js'
+
 export function roundToWorld(value) {
-  return roundToMap(value) << 6
+  return tileToWorld(worldToTile(value))
 }
 
-export function roundToMap(value) {
-  return Math.trunc(value) >> 6
-}
+export { worldToTile as roundToMap }

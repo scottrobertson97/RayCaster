@@ -1,6 +1,8 @@
 import { ASSET_IDS } from '../assets/asset-manifest.js'
-import { Vec2 } from '../math/vec2.js'
 import { LOOK_PITCH_MAX_RAD, LOOK_PITCH_SPEED } from '../config/constants.js'
+import { isSolidTileId } from '../data/tile-definitions.js'
+import { worldToTile } from '../math/tile-coordinates.js'
+import { Vec2 } from '../math/vec2.js'
 import { Bullet } from './bullet.js'
 import { norm } from '../math/geometry.js'
 
@@ -61,9 +63,9 @@ export class Player {
     const mapWidth = map[0]?.length ?? 0
     const tileAt = (tileX, tileY) => {
       if (tileY < 0 || tileY >= mapHeight || tileX < 0 || tileX >= mapWidth) {
-        return 1
+        return true
       }
-      return map[tileY][tileX]
+      return isSolidTileId(map[tileY][tileX])
     }
 
     const d = kb.move()
@@ -71,10 +73,10 @@ export class Player {
     this.dy = Math.sin(this.a) * this.speed * dt
     if (!d) return
 
-    const oldX = Math.trunc(this.x) >> 6
-    const oldY = Math.trunc(this.y) >> 6
-    const newX = Math.trunc(this.x + this.dx * d) >> 6
-    const newY = Math.trunc(this.y + this.dy * d) >> 6
+    const oldX = worldToTile(this.x)
+    const oldY = worldToTile(this.y)
+    const newX = worldToTile(this.x + this.dx * d)
+    const newY = worldToTile(this.y + this.dy * d)
 
     if (!tileAt(newX, newY) || newX === oldX || (newY !== oldY && !tileAt(newX, oldY))) {
       this.x += this.dx * d

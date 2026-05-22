@@ -192,7 +192,7 @@ Each backlog item is shaped as an implementation ticket. Acceptance criteria sho
 
 ### ENG-009: Add Tile Metadata System
 
-**Status:** Backlog
+**Status:** Complete
 
 **Goal:** Let tile IDs declare behavior such as solid, door, locked door, pickup spawn, texture, and interaction type.
 
@@ -215,7 +215,7 @@ Each backlog item is shaped as an implementation ticket. Acceptance criteria sho
 
 ### ENG-010: Centralize World/Tile Conversion Helpers
 
-**Status:** Backlog
+**Status:** Complete
 
 **Goal:** Replace repeated `Math.trunc(value) >> 6` logic with shared conversion helpers.
 

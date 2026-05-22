@@ -1,5 +1,7 @@
 import { P2, P3, TWO_PI, DR, DOF } from '../config/constants.js'
+import { isSolidTileId } from '../data/tile-definitions.js'
 import { lineIntersect, dist, norm } from '../math/geometry.js'
+import { isTileInBounds, worldToTile } from '../math/tile-coordinates.js'
 import { GameMap } from '../map/game-map.js'
 
 function isIgnoredTile(ignoreTile, tileX, tileY) {
@@ -127,10 +129,10 @@ export function castHorizontalRay(state, angle, ignoreTile = null) {
   }
 
   while (dof < DOF) {
-    const mx = Math.trunc(rayX) >> 6
-    const my = Math.trunc(rayY) >> 6
+    const mx = worldToTile(rayX)
+    const my = worldToTile(rayY)
 
-    if (mx >= 0 && my >= 0 && mx < map.width && my < map.height && map[my][mx] > 0) {
+    if (isTileInBounds(map, mx, my) && isSolidTileId(map[my][mx])) {
       if (isIgnoredTile(ignoreTile, mx, my)) {
         rayX += xo
         rayY += yo
@@ -191,10 +193,10 @@ export function castVerticalRay(state, angle, ignoreTile = null) {
   }
 
   while (dof < DOF) {
-    const mx = Math.trunc(rayX) >> 6
-    const my = Math.trunc(rayY) >> 6
+    const mx = worldToTile(rayX)
+    const my = worldToTile(rayY)
 
-    if (mx >= 0 && my >= 0 && mx < map.width && my < map.height && map[my][mx] > 0) {
+    if (isTileInBounds(map, mx, my) && isSolidTileId(map[my][mx])) {
       if (isIgnoredTile(ignoreTile, mx, my)) {
         rayX += xo
         rayY += yo

@@ -1,7 +1,8 @@
-import { ASSET_IDS } from '../assets/asset-manifest.js'
-import { KEYCARD_RED_TILE_ID, KEY_RED } from '../config/constants.js'
+import { KEY_RED } from '../config/constants.js'
+import { getTileDefinition, isPickupSpawnTileId } from '../data/tile-definitions.js'
 import { Pickup } from '../entities/pickup.js'
 import { GameMap } from '../map/game-map.js'
+import { tilePointCenter } from '../math/tile-coordinates.js'
 
 const PICKUP_RADIUS = GameMap.size * 0.35
 const PICKUP_RADIUS_SQ = PICKUP_RADIUS * PICKUP_RADIUS
@@ -38,12 +39,16 @@ function collectPickup(state, pickup) {
 export function initializeKeycardsFromMap(state) {
   for (let y = 0; y < state.world.map.height; y++) {
     for (let x = 0; x < state.world.map.width; x++) {
-      if (state.world.map[y][x] !== KEYCARD_RED_TILE_ID) continue
+      const tile = state.world.map[y][x]
+      if (!isPickupSpawnTileId(tile)) continue
 
-      const centerX = x * GameMap.size + GameMap.size * 0.5
-      const centerY = y * GameMap.size + GameMap.size * 0.5
-      state.entities.pickups.push(new Pickup(centerX, centerY, 10, ASSET_IDS.sprites.redKeycard, KEY_RED))
-      state.world.map.setTile(x, y, 0)
+      const definition = getTileDefinition(tile)
+
+      const { x: centerX, y: centerY } = tilePointCenter(x, y)
+      state.entities.pickups.push(
+        new Pickup(centerX, centerY, 10, definition.asset, definition.pickupType)
+      )
+      state.world.map.setTile(x, y, definition.clearTileId)
     }
   }
 }

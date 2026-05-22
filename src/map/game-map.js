@@ -1,4 +1,5 @@
 import { walls as defaultWalls } from '../assets/textures.js'
+import { TILE_SIZE } from '../math/tile-coordinates.js'
 
 function isDrawableImage(image) {
   return image?.complete && image.naturalWidth > 0 && image.naturalHeight > 0
@@ -49,6 +50,6 @@ export class GameMap extends Array {
   }
 
   static get size() {
-    return 64
+    return TILE_SIZE
   }
 }

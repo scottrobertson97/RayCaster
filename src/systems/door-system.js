@@ -2,36 +2,24 @@ import {
   DOOR_CLOSE_DURATION,
   DOOR_HOLD_DURATION,
   DOOR_INTERACT_RANGE,
-  DOOR_LOCKED_RED_TILE_ID,
   DOOR_OPEN_DURATION,
   DOOR_OPEN_PASSABLE_THRESHOLD,
   DOOR_UNLOCKED_TILE_ID,
   KEY_RED,
 } from '../config/constants.js'
-import { GameMap } from '../map/game-map.js'
+import { getTileDefinition, isDoorTileId, isSolidTileId } from '../data/tile-definitions.js'
+import { getTileKey, isTileInBounds, tilePointCenter, worldToTile } from '../math/tile-coordinates.js'
 import { setUiNotice } from './keycard-system.js'
 
 const DOOR_CLOSE_RETRY_DELAY = 0.15
 const EPSILON = 0.000001
 
-function getDoorKey(tileX, tileY) {
-  return `${tileX},${tileY}`
-}
-
-function worldToTile(value) {
-  return Math.trunc(value) >> 6
-}
-
 function setDoorPhase(door, phase) {
   door.phase = phase
 }
 
-function isDoorTile(tile) {
-  return tile === DOOR_UNLOCKED_TILE_ID || tile === DOOR_LOCKED_RED_TILE_ID
-}
-
 function getClosedDoorTile(door) {
-  return door.locked ? DOOR_LOCKED_RED_TILE_ID : DOOR_UNLOCKED_TILE_ID
+  return door.closedTileId
 }
 
 function hasRequiredKey(state, door) {
@@ -51,6 +39,7 @@ function tryUnlockDoor(state, door) {
 
   door.locked = false
   door.requiredKey = null
+  door.closedTileId = DOOR_UNLOCKED_TILE_ID
   ensureDoorTile(state, door, DOOR_UNLOCKED_TILE_ID)
   return true
 }
@@ -87,21 +76,20 @@ function getClosestDoorInFront(state) {
     const sampleY = state.world.player.y + direction.y * stepDistance * i
     const tileX = worldToTile(sampleX)
     const tileY = worldToTile(sampleY)
-    if (tileY < 0 || tileY >= state.world.map.height || tileX < 0 || tileX >= state.world.map.width) {
+    if (!isTileInBounds(state.world.map, tileX, tileY)) {
       break
     }
 
     const sampledTile = state.world.map[tileY][tileX]
-    if (sampledTile > 0 && !isDoorTile(sampledTile)) {
+    if (isSolidTileId(sampledTile) && !isDoorTileId(sampledTile)) {
       break
     }
 
-    const key = getDoorKey(tileX, tileY)
+    const key = getTileKey(tileX, tileY)
     const door = state.world.doors[key]
     if (!door) continue
 
-    const centerX = tileX * GameMap.size + GameMap.size * 0.5
-    const centerY = tileY * GameMap.size + GameMap.size * 0.5
+    const { x: centerX, y: centerY } = tilePointCenter(tileX, tileY)
     const dx = centerX - state.world.player.x
     const dy = centerY - state.world.player.y
     const distance = Math.sqrt(dx * dx + dy * dy)
@@ -184,14 +172,17 @@ export function initializeDoorsFromMap(state) {
   for (let y = 0; y < state.world.map.height; y++) {
     for (let x = 0; x < state.world.map.width; x++) {
       const tile = state.world.map[y][x]
-      if (!isDoorTile(tile)) continue
+      if (!isDoorTileId(tile)) continue
 
-      const key = getDoorKey(x, y)
+      const definition = getTileDefinition(tile)
+
+      const key = getTileKey(x, y)
       doors[key] = {
         tileX: x,
         tileY: y,
-        locked: tile === DOOR_LOCKED_RED_TILE_ID,
-        requiredKey: tile === DOOR_LOCKED_RED_TILE_ID ? KEY_RED : null,
+        locked: definition.locked,
+        requiredKey: definition.requiredKey ?? null,
+        closedTileId: definition.closedTileId,
         phase: 'closed',
         openAmount: 0,
         holdTimer: 0,
