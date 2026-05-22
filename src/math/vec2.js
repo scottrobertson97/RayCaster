@@ -28,11 +28,11 @@ export class Vec2 {
   }
 
   static add(v1, v2) {
-    return { x: v1.x + v2.x, y: v1.y + v2.y }
+    return new Vec2({ x: v1.x + v2.x, y: v1.y + v2.y })
   }
 
   static scale(v, s) {
-    return { x: v.x * s, y: v.y * s }
+    return new Vec2({ x: v.x * s, y: v.y * s })
   }
 
   static copy(v) {
@@ -41,7 +41,7 @@ export class Vec2 {
 
   static normalized(v) {
     const mag = Vec2.dist(v, new Vec2())
-    return { x: v.x / mag, y: v.y / mag }
+    return new Vec2({ x: v.x / mag, y: v.y / mag })
   }
 
   static dist(v1, v2) {
