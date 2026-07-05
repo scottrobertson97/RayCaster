@@ -16,7 +16,7 @@
 - Typecheck only: `npm run typecheck`
 - Production build: `npm run build`
 - Preview built output: `npm run preview`
-- Trigger deployment: push to `main` (or run workflow manually in GitHub Actions).
+- Trigger deployment: push to `master` (or run workflow manually in GitHub Actions).
 
 ## Core File Map
 - `src/main.ts`: Composition root and game bootstrap.

@@ -108,4 +108,6 @@ Documentation-only changes do not require a gameplay smoke test.
 
 GitHub Pages is built by `.github/workflows/deploy-pages.yml`.
 
-On pushes to `main`, GitHub Actions runs `npm ci`, `npm run build`, uploads `dist/` as a Pages artifact, and deploys it through the official GitHub Pages Actions flow.
+On pushes to `master`, GitHub Actions runs `npm ci`, `npm run build`, uploads `dist/` as a Pages artifact, and deploys it through the official GitHub Pages Actions flow.
+
+In the repository's GitHub Pages settings, set **Build and deployment > Source** to **GitHub Actions**. If Pages is set to publish directly from the branch/root, it will serve the raw Vite entry HTML instead of the built `dist/` output.
