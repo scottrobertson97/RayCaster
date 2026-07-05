@@ -1,5 +1,5 @@
 import { createImageAsset } from '../assets/asset-manifest.js'
-import { dist } from '../math/geometry.js'
+import { getCameraBasis, getProjectionPlaneDistance, worldToCameraSpace } from '../math/projection.js'
 import { GameMap } from '../map/game-map.js'
 import type { Entity } from '../entities/entity.js'
 import type { AssetRef, GameState, SpriteDescriptor } from '../types.js'
@@ -40,7 +40,7 @@ function advanceSpriteFrame(sprite: SpriteDescriptor, dt: number) {
 export function drawSpriteEntity(
   entity: Entity,
   state: GameState,
-  { fov = 90, pitchOffset = 0 }: { fov?: number; pitchOffset?: number } = {},
+  { pitchOffset = 0 }: { pitchOffset?: number } = {},
 ) {
   const { sprite } = entity
   if (!sprite) return
@@ -50,33 +50,19 @@ export function drawSpriteEntity(
   const image = getCurrentFrame(sprite)
   if (!isDrawableImage(image)) return
 
-  const disT = dist(player.x, player.y, entity.x, entity.y)
-  const minT = player.a - (fov / 2) * (Math.PI / 180)
-  const maxT = player.a + (fov / 2) * (Math.PI / 180)
-  const x = entity.x - player.x
-  const y = entity.y - player.y
+  const projectionPlaneDistance = getProjectionPlaneDistance(view.width, state.render.fov)
+  const cameraPoint = worldToCameraSpace(
+    getCameraBasis(player.x, player.y, player.a),
+    entity.x,
+    entity.y,
+  )
+  if (cameraPoint.depth <= 0) return
 
-  let t = Math.atan(y / x)
-  if (y < 0 && x > 0) {
-    t += Math.PI * 2
-  } else if ((y > 0 && x < 0) || (y < 0 && x < 0)) {
-    t += Math.PI
-  }
-
-  const ca = player.a - t
-  const correctedDistance = disT * Math.cos(ca)
+  const correctedDistance = cameraPoint.depth
   const lineH = Math.trunc((GameMap.size * view.height * sprite.height) / correctedDistance)
   const lineO = view.halfHeight * 0.75 - Math.trunc(lineH / 2) + pitchOffset
   const width = lineH * getImageRatio(image)
-
-  let percent = (t - minT) / (maxT - minT)
-  if (minT < 0 && t > player.a + Math.PI) {
-    percent = (t - minT - Math.PI * 2) / (maxT - minT)
-  } else if (maxT > Math.PI * 2 && t < player.a - Math.PI) {
-    percent = (t - minT + Math.PI * 2) / (maxT - minT)
-  }
-
-  const cx = percent * view.width - width / 2
+  const cx = view.width * 0.5 + (cameraPoint.lateral * projectionPlaneDistance) / cameraPoint.depth - width / 2
   state.render.ctx.drawImage(image, cx, lineO, width, lineH)
   advanceSpriteFrame(sprite, state.runtime.dt)
 

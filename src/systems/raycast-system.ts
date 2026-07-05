@@ -1,6 +1,11 @@
-import { P2, P3, TWO_PI, DR, DOF } from '../config/constants.js'
+import { P2, P3, DOF } from '../config/constants.js'
 import { isSolidTileId } from '../data/tile-definitions.js'
 import { lineIntersect, dist, norm } from '../math/geometry.js'
+import {
+  getProjectionPlaneDistance,
+  getRayAngleForScreenX,
+  getScreenColumnCenter,
+} from '../math/projection.js'
 import { isTileInBounds, worldToTile } from '../math/tile-coordinates.js'
 import { GameMap } from '../map/game-map.js'
 import { isSpriteVisible, markSpriteVisible } from '../render/sprite-visibility.js'
@@ -11,18 +16,19 @@ function isIgnoredTile(ignoreTile: Point | null, tileX: number, tileY: number) {
   return ignoreTile && ignoreTile.x === tileX && ignoreTile.y === tileY
 }
 
-export function normalizeAngle(angle: number) {
-  angle %= TWO_PI
-  return angle < 0 ? angle + TWO_PI : angle
-}
-
 export function castSceneRays(state: GameState, entitiesList: Entity[]): WallRayEntry[] {
   const rays: WallRayEntry[] = []
   const columnCount = state.render.view.width / state.render.horRes
-  const angleStep = (state.render.fov / state.render.view.width) * state.render.horRes * DR
-  let rayAngle = normalizeAngle(state.world.player.a - DR * (state.render.fov / 2))
+  const projectionPlaneDistance = getProjectionPlaneDistance(state.render.view.width, state.render.fov)
 
   for (let r = 0; r < columnCount; r++) {
+    const screenX = getScreenColumnCenter(r, state.render.horRes)
+    const rayAngle = getRayAngleForScreenX(
+      state.world.player.a,
+      screenX,
+      state.render.view.width,
+      projectionPlaneDistance,
+    )
     const rayData = castSceneRay(state, rayAngle, r)
     const raySegment = {
       x1: rayData.ray.x,
@@ -70,7 +76,6 @@ export function castSceneRays(state: GameState, entitiesList: Entity[]): WallRay
 
     applyFog(state, rayData)
     rays.push(rayData)
-    rayAngle = normalizeAngle(rayAngle + angleStep)
   }
 
   return rays

@@ -1,20 +1,18 @@
-import { DR, WORLD_HEIGHT_RATIO } from '../config/constants.js'
+import { WORLD_HEIGHT_RATIO } from '../config/constants.js'
+import {
+  getCameraBasis,
+  getProjectionPlaneDistance,
+  worldToCameraSpace,
+  type CameraBasis,
+  type CameraSpacePoint,
+} from '../math/projection.js'
 import { GameMap } from '../map/game-map.js'
 import type { GameState } from '../types.js'
 
-type CameraSpacePoint = {
-  lateral: number
-  depth: number
-}
-
-type FloorProjectionParams = {
-  cosAngle: number
-  sinAngle: number
+type FloorProjectionParams = CameraBasis & {
   floorScale: number
   horizonY: number
   nearDepth: number
-  playerX: number
-  playerY: number
   projectionPlaneDistance: number
   viewWidth: number
 }
@@ -54,17 +52,12 @@ function drawFloorGrid(state: GameState, horizonY: number, worldHeight: number) 
 
   const ctx = state.render.ctx
   const player = state.world.player
-  const halfFovRadians = (state.render.fov * DR) / 2
-  const projectionPlaneDistance = state.render.view.width / (2 * Math.tan(halfFovRadians))
   const params: FloorProjectionParams = {
-    cosAngle: Math.cos(player.a),
-    sinAngle: Math.sin(player.a),
+    ...getCameraBasis(player.x, player.y, player.a),
     floorScale: GameMap.size * worldHeight * 0.5,
     horizonY,
     nearDepth: GameMap.size * 0.12,
-    playerX: player.x,
-    playerY: player.y,
-    projectionPlaneDistance,
+    projectionPlaneDistance: getProjectionPlaneDistance(state.render.view.width, state.render.fov),
     viewWidth: state.render.view.width,
   }
 
@@ -96,8 +89,8 @@ function drawProjectedFloorLine(
   endX: number,
   endY: number,
 ) {
-  const start = toCameraSpace(params, startX, startY)
-  const end = toCameraSpace(params, endX, endY)
+  const start = worldToCameraSpace(params, startX, startY)
+  const end = worldToCameraSpace(params, endX, endY)
   const clipped = clipToNearDepth(start, end, params.nearDepth)
 
   if (!clipped) return
@@ -109,16 +102,6 @@ function drawProjectedFloorLine(
   ctx.moveTo(projectedStart.x, projectedStart.y)
   ctx.lineTo(projectedEnd.x, projectedEnd.y)
   ctx.stroke()
-}
-
-function toCameraSpace(params: FloorProjectionParams, worldX: number, worldY: number): CameraSpacePoint {
-  const dx = worldX - params.playerX
-  const dy = worldY - params.playerY
-
-  return {
-    lateral: -dx * params.sinAngle + dy * params.cosAngle,
-    depth: dx * params.cosAngle + dy * params.sinAngle,
-  }
 }
 
 function clipToNearDepth(
