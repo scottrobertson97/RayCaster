@@ -10,13 +10,54 @@ import {
 } from '../config/constants.js'
 import { getTileDefinition, isDoorTileId, isSolidTileId } from '../data/tile-definitions.js'
 import { getTileKey, isTileInBounds, tilePointCenter, worldToTile } from '../math/tile-coordinates.js'
-import { setUiNotice } from './keycard-system.js'
+import { setUiNotice } from '../ui/notice-state.js'
 
 const DOOR_CLOSE_RETRY_DELAY = 0.15
 const EPSILON = 0.000001
 
+// Door tiles are static spawn metadata; runtime door state lives in state.world.doors.
+// The map tile is toggled between the closed tile and 0 so existing collision and raycast systems keep working.
+export function getDoorAtTile(state, tileX, tileY) {
+  return state.world.doors?.[getTileKey(tileX, tileY)] ?? null
+}
+
+export function getDoorOpenAmount(door) {
+  return door?.openAmount ?? 0
+}
+
+export function shouldRenderThroughDoor(door, wallSamplePercent) {
+  return Boolean(door) && getDoorOpenAmount(door) > EPSILON && wallSamplePercent < getDoorOpenAmount(door)
+}
+
 function setDoorPhase(door, phase) {
   door.phase = phase
+}
+
+function setDoorHoldTimer(door, duration) {
+  door.holdTimer = duration
+}
+
+function tickDoorHoldTimer(state, door) {
+  door.holdTimer -= state.runtime.dt
+}
+
+function setDoorOpenAmount(door, openAmount) {
+  door.openAmount = openAmount
+}
+
+function openDoorByDelta(state, door) {
+  setDoorOpenAmount(door, Math.min(door.openAmount + state.runtime.dt / DOOR_OPEN_DURATION, 1))
+}
+
+function closeDoorByDelta(state, door) {
+  setDoorOpenAmount(door, Math.max(door.openAmount - state.runtime.dt / DOOR_CLOSE_DURATION, 0))
+}
+
+function unlockDoor(state, door) {
+  door.locked = false
+  door.requiredKey = null
+  door.closedTileId = DOOR_UNLOCKED_TILE_ID
+  setDoorCollisionTile(state, door, DOOR_UNLOCKED_TILE_ID)
 }
 
 function getClosedDoorTile(door) {
@@ -42,14 +83,11 @@ function tryUnlockDoor(state, door) {
     return false
   }
 
-  door.locked = false
-  door.requiredKey = null
-  door.closedTileId = DOOR_UNLOCKED_TILE_ID
-  ensureDoorTile(state, door, DOOR_UNLOCKED_TILE_ID)
+  unlockDoor(state, door)
   return true
 }
 
-function ensureDoorTile(state, door, tileValue) {
+function setDoorCollisionTile(state, door, tileValue) {
   if (state.world.map[door.tileY][door.tileX] !== tileValue) {
     state.world.map.setTile(door.tileX, door.tileY, tileValue)
   }
@@ -90,8 +128,7 @@ function getClosestDoorInFront(state) {
       break
     }
 
-    const key = getTileKey(tileX, tileY)
-    const door = state.world.doors[key]
+    const door = getDoorAtTile(state, tileX, tileY)
     if (!door) continue
 
     const { x: centerX, y: centerY } = tilePointCenter(tileX, tileY)
@@ -115,12 +152,12 @@ function activateDoor(state, door) {
 
   if (door.phase === 'closing') {
     setDoorPhase(door, 'opening')
-    ensureDoorTile(state, door, 0)
+    setDoorCollisionTile(state, door, 0)
     return
   }
 
   if (door.phase === 'open') {
-    door.holdTimer = DOOR_HOLD_DURATION
+    setDoorHoldTimer(door, DOOR_HOLD_DURATION)
     return
   }
 
@@ -128,46 +165,46 @@ function activateDoor(state, door) {
 }
 
 function updateDoorOpening(state, door) {
-  door.openAmount = Math.min(door.openAmount + state.runtime.dt / DOOR_OPEN_DURATION, 1)
+  openDoorByDelta(state, door)
   if (door.openAmount < DOOR_OPEN_PASSABLE_THRESHOLD - EPSILON) {
     return
   }
 
-  ensureDoorTile(state, door, 0)
-  door.openAmount = 1
-  door.holdTimer = DOOR_HOLD_DURATION
+  setDoorCollisionTile(state, door, 0)
+  setDoorOpenAmount(door, 1)
+  setDoorHoldTimer(door, DOOR_HOLD_DURATION)
   setDoorPhase(door, 'open')
 }
 
 function updateDoorOpen(state, door) {
-  ensureDoorTile(state, door, 0)
-  door.holdTimer -= state.runtime.dt
+  setDoorCollisionTile(state, door, 0)
+  tickDoorHoldTimer(state, door)
   if (door.holdTimer > 0) return
 
   if (isDoorBlockedByActors(state, door)) {
-    door.holdTimer = DOOR_CLOSE_RETRY_DELAY
+    setDoorHoldTimer(door, DOOR_CLOSE_RETRY_DELAY)
     return
   }
 
-  ensureDoorTile(state, door, getClosedDoorTile(door))
+  setDoorCollisionTile(state, door, getClosedDoorTile(door))
   setDoorPhase(door, 'closing')
 }
 
 function updateDoorClosing(state, door) {
-  ensureDoorTile(state, door, getClosedDoorTile(door))
+  setDoorCollisionTile(state, door, getClosedDoorTile(door))
 
   if (isDoorBlockedByActors(state, door)) {
-    ensureDoorTile(state, door, 0)
+    setDoorCollisionTile(state, door, 0)
     setDoorPhase(door, 'opening')
     return
   }
 
-  door.openAmount = Math.max(door.openAmount - state.runtime.dt / DOOR_CLOSE_DURATION, 0)
+  closeDoorByDelta(state, door)
   if (door.openAmount > EPSILON) {
     return
   }
 
-  door.openAmount = 0
+  setDoorOpenAmount(door, 0)
   setDoorPhase(door, 'closed')
 }
 
@@ -223,6 +260,6 @@ export function updateDoors(state) {
       return
     }
 
-    ensureDoorTile(state, door, getClosedDoorTile(door))
+    setDoorCollisionTile(state, door, getClosedDoorTile(door))
   })
 }

@@ -3,9 +3,9 @@ import {
   CROSSHAIR_SPACE,
   CROSSHAIR_WIDTH,
   FONT_SIZE,
-  FPS_UPDATE_INTERVAL,
   WORLD_HEIGHT_RATIO,
 } from '../config/constants.js'
+import { updateFpsCounter } from '../ui/fps-counter.js'
 
 export function drawUI(state) {
   const uiTop = state.render.view.height * WORLD_HEIGHT_RATIO
@@ -55,11 +55,5 @@ export function drawUI(state) {
     state.render.ctx.fillStyle = 'black'
   }
 
-  state.ui.fpsCounterBuffer += state.runtime.dt
-  if (state.ui.fpsCounterBuffer > FPS_UPDATE_INTERVAL) {
-    state.ui.fpsCounterBuffer = 0
-    state.ui.fpsLast = Math.trunc(1 / state.runtime.dt)
-  }
-
-  state.render.ctx.fillText(`${state.ui.fpsLast} fps`, 10, uiTop + hudLineStep * 7)
+  state.render.ctx.fillText(`${updateFpsCounter(state)} fps`, 10, uiTop + hudLineStep * 7)
 }

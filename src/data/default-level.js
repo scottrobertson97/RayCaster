@@ -1,4 +1,5 @@
 import { ASSET_IDS } from '../assets/asset-manifest.js'
+import { KEY_GREEN, KEY_RED } from '../config/constants.js'
 import { mapMatrix } from './map-matrix.js'
 
 export const defaultLevel = {
@@ -32,6 +33,22 @@ export const defaultLevel = {
       y: 750,
       size: 40,
       asset: ASSET_IDS.sprites.decoration,
+    },
+    {
+      type: 'pickup',
+      x: 608,
+      y: 352,
+      size: 10,
+      asset: ASSET_IDS.sprites.redKeycard,
+      pickupType: KEY_RED,
+    },
+    {
+      type: 'pickup',
+      x: 608,
+      y: 224,
+      size: 10,
+      asset: ASSET_IDS.sprites.greenKeycard,
+      pickupType: KEY_GREEN,
     },
   ],
 }

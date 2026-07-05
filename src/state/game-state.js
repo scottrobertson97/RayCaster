@@ -6,12 +6,14 @@ export function createGameState({ viewCanvas, mapCanvas, ctx, mapCtx, map, playe
     bullets: [],
     enemies: [],
     pickups: [],
+    sprites: [],
     getEntities() {
-      return this.enemies.concat(this.bullets, this.pickups)
+      return this.enemies.concat(this.bullets, this.pickups, this.sprites)
     },
   }
 
   return {
+    // World state owns map geometry, actor state, doors, and inventory.
     world: {
       map,
       player,
@@ -21,10 +23,13 @@ export function createGameState({ viewCanvas, mapCanvas, ctx, mapCtx, map, playe
         hasGreenKeycard: false,
       },
     },
+    // Entity collections are the source of truth for updatable/renderable actors.
     entities,
+    // Input state is owned by input systems and snapshotted once per frame.
     input: {
       keyboard,
     },
+    // UI state owns transient HUD values such as notices and FPS counters.
     ui: {
       notice: {
         text: '',
@@ -33,9 +38,11 @@ export function createGameState({ viewCanvas, mapCanvas, ctx, mapCtx, map, playe
       fpsCounterBuffer: 0,
       fpsLast: 0,
     },
+    // Assets are read-only runtime references used by renderers.
     assets: {
       walls,
     },
+    // Render state owns canvas handles, debug toggles, ray output, and view config.
     render: {
       canvases: {
         view: viewCanvas,
@@ -66,6 +73,7 @@ export function createGameState({ viewCanvas, mapCanvas, ctx, mapCtx, map, playe
         },
       },
     },
+    // Runtime state owns frame timing.
     runtime: {
       lastTime: 0,
       dt: 0,

@@ -3,7 +3,6 @@ import { GameRuntime } from './game-runtime.js'
 import { GameMap } from '../map/game-map.js'
 import { createGameState } from '../state/game-state.js'
 import { initializeDoorsFromMap } from '../systems/door-system.js'
-import { initializeKeycardsFromMap } from '../systems/keycard-system.js'
 import { bindControls } from '../ui/controls.js'
 
 export function createRaycasterGame({
@@ -32,7 +31,6 @@ export function createRaycasterGame({
 
   setupCanvas(state)
   initializeDoorsFromMap(state)
-  initializeKeycardsFromMap(state)
   seedEntities(state, entities)
   bindControls(state, controlsRoot)
 
@@ -54,4 +52,5 @@ function seedEntities(state, entities) {
   state.entities.enemies.push(...(entities.enemies ?? []))
   state.entities.bullets.push(...(entities.bullets ?? []))
   state.entities.pickups.push(...(entities.pickups ?? []))
+  state.entities.sprites.push(...(entities.sprites ?? []))
 }

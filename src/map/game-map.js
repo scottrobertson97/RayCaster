@@ -15,6 +15,7 @@ export class GameMap extends Array {
 
   setTile(x, y, i) {
     this[y][x] = i
+    // Tile mutation owns minimap cache invalidation.
     this.img = null
   }
 

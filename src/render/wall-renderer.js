@@ -1,8 +1,7 @@
 import { GameMap } from '../map/game-map.js'
 import { WORLD_HEIGHT_RATIO } from '../config/constants.js'
+import { getDoorAtTile, shouldRenderThroughDoor } from '../systems/door-system.js'
 import { applyFog, castSceneRay } from '../systems/raycast-system.js'
-
-const DOOR_OPEN_EPSILON = 0.0001
 
 function isDrawableImage(image) {
   return image?.complete && image.naturalWidth > 0 && image.naturalHeight > 0
@@ -60,9 +59,9 @@ export function drawRayWall(state, rayData) {
   const y = mp.y
   const imgID = state.world.map[y][x]
   const percentage = getWallSamplePercent(ray, isVertical, isUp, isLeft)
-  const door = state.world.doors?.[`${x},${y}`]
+  const door = getDoorAtTile(state, x, y)
 
-  if (door && door.openAmount > DOOR_OPEN_EPSILON && percentage < door.openAmount) {
+  if (shouldRenderThroughDoor(door, percentage)) {
     drawBehindDoorRay(state, rayData)
     return
   }

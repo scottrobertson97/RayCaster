@@ -1,7 +1,8 @@
-export class Entity {
+import { WorldObject } from './world-object.js'
+
+export class Entity extends WorldObject {
   constructor(x, y, size, assetRef, frameRate = 0.5, spriteOptions = {}) {
-    this.x = x
-    this.y = y
+    super(x, y)
     this.size = size
     this.speed = 0.2
     this.sprite = createSpriteDescriptor(assetRef, frameRate, spriteOptions)
@@ -13,10 +14,6 @@ export class Entity {
 
   get min() {
     return { x: this.x - this.size, y: this.y - this.size }
-  }
-
-  get point() {
-    return { x: this.x, y: this.y }
   }
 
   update(_player, _normFn, _map) {}

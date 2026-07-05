@@ -5,32 +5,17 @@ import { worldToTile } from '../math/tile-coordinates.js'
 import { Vec2 } from '../math/vec2.js'
 import { Bullet } from './bullet.js'
 import { norm } from '../math/geometry.js'
+import { WorldObject } from './world-object.js'
 
-export class Player {
+export class Player extends WorldObject {
   constructor(x = 0, y = 0, a = 0, speed = 200, lookSpeed = 2) {
-    this.pos = new Vec2({ x, y })
+    super(x, y)
     this.a = a
     this.pitch = 0
     this.speed = speed
     this.lookSpeed = lookSpeed
     this.dx = Math.cos(this.a) * this.speed * (1 / 60)
     this.dy = Math.sin(this.a) * this.speed * (1 / 60)
-  }
-
-  get x() {
-    return this.pos.x
-  }
-
-  get y() {
-    return this.pos.y
-  }
-
-  set x(val) {
-    this.pos.x = val
-  }
-
-  set y(val) {
-    this.pos.y = val
   }
 
   update(dt, kb, map, spawnBullet) {
@@ -78,11 +63,19 @@ export class Player {
     const newX = worldToTile(this.x + this.dx * d)
     const newY = worldToTile(this.y + this.dy * d)
 
-    if (!tileAt(newX, newY) || newX === oldX || (newY !== oldY && !tileAt(newX, oldY))) {
+    if (
+      !tileAt(newX, newY) ||
+      newX === oldX ||
+      (newY !== oldY && !tileAt(newX, oldY))
+    ) {
       this.x += this.dx * d
     }
 
-    if (!tileAt(newX, newY) || newY === oldY || (newX !== oldX && !tileAt(oldX, newY))) {
+    if (
+      !tileAt(newX, newY) ||
+      newY === oldY ||
+      (newX !== oldX && !tileAt(oldX, newY))
+    ) {
       this.y += this.dy * d
     }
   }
@@ -92,7 +85,9 @@ export class Player {
 
     if (kb.actionPressed('fire')) {
       const direction = norm({ x: Math.cos(this.a), y: Math.sin(this.a) })
-      spawnBullet(new Bullet(this.x, this.y, direction, 5, ASSET_IDS.sprites.bullet))
+      spawnBullet(
+        new Bullet(this.x, this.y, direction, 5, ASSET_IDS.sprites.bullet),
+      )
     }
   }
 

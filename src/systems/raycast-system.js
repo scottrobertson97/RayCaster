@@ -3,6 +3,7 @@ import { isSolidTileId } from '../data/tile-definitions.js'
 import { lineIntersect, dist, norm } from '../math/geometry.js'
 import { isTileInBounds, worldToTile } from '../math/tile-coordinates.js'
 import { GameMap } from '../map/game-map.js'
+import { isSpriteVisible, markSpriteVisible } from '../render/sprite-visibility.js'
 
 function isIgnoredTile(ignoreTile, tileX, tileY) {
   return ignoreTile && ignoreTile.x === tileX && ignoreTile.y === tileY
@@ -29,7 +30,7 @@ export function castSceneRays(state, entitiesList) {
     }
 
     entitiesList.forEach(entity => {
-      if (entity.sprite?.visible) return
+      if (isSpriteVisible(entity)) return
 
       const diag1 = {
         x1: entity.x - entity.size,
@@ -52,7 +53,7 @@ export function castSceneRays(state, entitiesList) {
           state.render.mapCtx.strokeStyle = 'pink'
           state.render.mapCtx.stroke()
         }
-        entity.sprite.visible = true
+        markSpriteVisible(entity)
       }
     })
 

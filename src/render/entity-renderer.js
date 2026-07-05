@@ -3,11 +3,12 @@ import { WORLD_HEIGHT_RATIO } from '../config/constants.js'
 import { castSceneRays } from '../systems/raycast-system.js'
 import { fillSceneBackground } from './background-renderer.js'
 import { drawSpriteEntity, drawSpriteEntity2D } from './sprite-renderer.js'
+import { isSpriteVisible, resetSpriteVisibility } from './sprite-visibility.js'
 import { drawRayWall } from './wall-renderer.js'
 
 function addEntityRays(state, rays, entitiesList) {
   entitiesList.forEach((entity, index) => {
-    if (entity.sprite?.visible) {
+    if (isSpriteVisible(entity)) {
       rays.push({
         disT: dist(entity.x, entity.y, state.world.player.x, state.world.player.y),
         isSprite: true,
@@ -25,11 +26,7 @@ export function drawRaycastScene(state) {
   fillSceneBackground(state)
 
   const visibleEntities = state.entities.getEntities()
-  visibleEntities.forEach(entity => {
-    if (entity.sprite) {
-      entity.sprite.visible = false
-    }
-  })
+  resetSpriteVisibility(visibleEntities)
 
   const rays = castSceneRays(state, visibleEntities)
   addEntityRays(state, rays, visibleEntities)
