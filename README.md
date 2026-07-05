@@ -1,6 +1,6 @@
 # RayCaster
 
-RayCaster is a browser-based JavaScript raycasting FPS inspired by Wolfenstein 3D. It uses native browser ES modules and HTML canvas, with no required build step or runtime toolchain.
+RayCaster is a browser-based TypeScript raycasting FPS inspired by Wolfenstein 3D. It uses Vite, native browser ES modules, and HTML canvas.
 
 The project is currently both a playable raycasting prototype and the starting point for a more modular browser game engine.
 
@@ -31,29 +31,37 @@ The project is currently both a playable raycasting prototype and the starting p
 
 ## Running Locally
 
-Open `index.html` in a browser, or serve the repo with any static file server.
-
-The included run action starts a local static server:
+Install dependencies once:
 
 ```sh
-npm run start
+npm install
 ```
 
-Then open `http://localhost:8000/` in your browser.
+Start the Vite dev server:
 
-To use a different port, run Python's static server directly with the port you want.
+```sh
+npm run dev
+```
+
+Then open the printed local URL, usually `http://127.0.0.1:5173/`.
+
+Run the production build used by GitHub Pages:
+
+```sh
+npm run build
+```
 
 The app entrypoint is:
 
 - `index.html`
-- `src/main.js`
+- `src/main.ts`
 
-No `npm install`, bundler, or transpiler is required by the project itself. The run action uses Python's built-in static file server.
+The build output is written to `dist/`.
 
 ## Project Structure
 
-- `src/main.js`: Composition root and game bootstrap.
-- `src/state/game-state.js`: Central mutable runtime state.
+- `src/main.ts`: Composition root and game bootstrap.
+- `src/state/game-state.ts`: Central mutable runtime state.
 - `src/systems/`: Gameplay and frame systems for player, enemies, bullets, collisions, doors, keycards, raycasting, and RAF timing.
 - `src/render/`: Canvas renderers for background, walls, billboard entities, HUD, and raycast scene composition.
 - `src/entities/`: Player, enemy, bullet, pickup, and base billboard entity classes.
@@ -61,7 +69,7 @@ No `npm install`, bundler, or transpiler is required by the project itself. The 
 - `src/input/`: Keyboard state and edge-trigger tracking.
 - `src/math/`: Geometry and vector helpers.
 - `src/assets/`: Texture/image loading.
-- `src/data/`: Current hardcoded map matrix.
+- `src/data/`: Current hardcoded map matrix and default level data.
 - `src/config/`: Shared constants for rendering, controls, doors, and gameplay tuning.
 - `src/ui/`: DOM control bindings.
 
@@ -77,7 +85,7 @@ The intended direction is to preserve the current static-browser simplicity whil
 
 - Keep simulation, rendering, input, assets, UI, and runtime lifecycle boundaries explicit.
 - Preserve the existing update order unless a ticket intentionally changes it.
-- Keep module imports browser-safe with explicit `.js` extensions.
+- Keep runtime modules TypeScript-first and let Vite build the browser bundle.
 - Treat `GameMap.size === 64` as a core world-unit contract until an engine ticket changes it deliberately.
 - Keep GitHub Pages/static-site deployment viable as the default.
 
@@ -95,3 +103,9 @@ After gameplay changes:
 8. Switch quality radio options and verify horizontal resolution changes.
 
 Documentation-only changes do not require a gameplay smoke test.
+
+## Deployment
+
+GitHub Pages is built by `.github/workflows/deploy-pages.yml`.
+
+On pushes to `main`, GitHub Actions runs `npm ci`, `npm run build`, uploads `dist/` as a Pages artifact, and deploys it through the official GitHub Pages Actions flow.

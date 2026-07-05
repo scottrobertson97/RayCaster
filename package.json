@@ -1,5 +1,17 @@
 {
+  "name": "raycaster",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
   "scripts": {
-    "start": "python3 -m http.server 8000 --bind localhost"
+    "dev": "vite --host 127.0.0.1",
+    "start": "npm run dev",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host 127.0.0.1"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3",
+    "vite": "^8.1.3"
   }
 }
