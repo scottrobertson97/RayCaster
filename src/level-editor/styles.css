@@ -1,0 +1,481 @@
+:root {
+  color-scheme: dark;
+  --bg: #121310;
+  --panel: #1b1d18;
+  --panel-strong: #24271f;
+  --text: #f4f1e8;
+  --muted: #b8b1a2;
+  --border: #3a3f34;
+  --focus: #f0c45d;
+  --danger: #d95b57;
+  --accent: #6fbf8b;
+  --cell-size: clamp(32px, 4.2vw, 48px);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background:
+    linear-gradient(135deg, rgba(240, 196, 93, 0.07), transparent 35%),
+    linear-gradient(315deg, rgba(111, 191, 139, 0.08), transparent 42%),
+    var(--bg);
+  color: var(--text);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: 0;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.editor-shell {
+  display: grid;
+  grid-template-columns: 260px minmax(360px, 1fr) 300px;
+  grid-template-rows: auto 1fr;
+  min-height: 100vh;
+}
+
+.topbar {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 82px;
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(18, 19, 16, 0.94);
+}
+
+.eyebrow {
+  margin: 0 0 2px;
+  color: var(--accent);
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  margin-bottom: 0;
+  font-size: clamp(1.4rem, 2.5vw, 2rem);
+  line-height: 1.1;
+}
+
+h2 {
+  margin-bottom: 10px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+h3 {
+  margin-bottom: 12px;
+  font-size: 1rem;
+}
+
+.topbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.palette-panel,
+.inspector-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 18px;
+  overflow-y: auto;
+  background: rgba(27, 29, 24, 0.92);
+}
+
+.palette-panel {
+  border-right: 1px solid var(--border);
+}
+
+.inspector-panel {
+  border-left: 1px solid var(--border);
+}
+
+.map-panel {
+  min-width: 0;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  background: #171914;
+}
+
+.map-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 10px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(36, 39, 31, 0.9);
+}
+
+.map-toolbar label,
+.field-row {
+  display: grid;
+  gap: 5px;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.map-toolbar input,
+.field-row input,
+.field-row select {
+  width: 100%;
+  min-height: 34px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 8px;
+  background: #0f110e;
+  color: var(--text);
+}
+
+.map-toolbar input {
+  width: 76px;
+}
+
+.tool-section {
+  min-width: 0;
+}
+
+.tool-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.tool-button,
+.ghost-button,
+.primary-button,
+.danger-button,
+.entity-list-item {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.tool-button {
+  min-height: 54px;
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background: #151711;
+  text-align: left;
+}
+
+.tool-button span:last-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.tool-button.is-active {
+  border-color: var(--focus);
+  background: #292516;
+}
+
+.tool-swatch {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  border-radius: 6px;
+  color: #fff;
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.ghost-button,
+.primary-button,
+.danger-button {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+}
+
+.ghost-button {
+  background: #171914;
+}
+
+.primary-button {
+  border-color: #d9a642;
+  background: #d9a642;
+  color: #191207;
+  font-weight: 800;
+}
+
+.danger-button {
+  width: 100%;
+  margin-top: 8px;
+  border-color: rgba(217, 91, 87, 0.72);
+  background: rgba(217, 91, 87, 0.18);
+}
+
+.grid-scroll {
+  overflow: auto;
+  padding: 18px;
+}
+
+.level-grid {
+  --map-width: 13;
+  display: grid;
+  grid-template-columns: repeat(var(--map-width), var(--cell-size));
+  gap: 3px;
+  width: max-content;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #0d0e0b;
+}
+
+.tile-cell {
+  position: relative;
+  width: var(--cell-size);
+  height: var(--cell-size);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.tile-cell:hover,
+.tile-cell:focus-visible,
+.tool-button:focus-visible,
+.ghost-button:focus-visible,
+.primary-button:focus-visible,
+.danger-button:focus-visible,
+.entity-list-item:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.tile-cell.is-selected {
+  box-shadow: 0 0 0 2px var(--focus) inset;
+}
+
+.tile-empty {
+  background: #1d2018;
+}
+
+.tile-stone {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.1) 25%, transparent 25%) 0 0 / 12px 12px,
+    #595d55;
+}
+
+.tile-metal {
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.18), transparent 55%),
+    #39444b;
+}
+
+.tile-door {
+  background:
+    linear-gradient(90deg, transparent 42%, #ead58d 42% 58%, transparent 58%),
+    #66512b;
+}
+
+.tile-red-door {
+  background:
+    linear-gradient(90deg, transparent 42%, #ffd4d0 42% 58%, transparent 58%),
+    #813432;
+}
+
+.tile-green-door {
+  background:
+    linear-gradient(90deg, transparent 42%, #d7ffd9 42% 58%, transparent 58%),
+    #2f6a44;
+}
+
+.tile-unknown {
+  background: #8d2d8d;
+}
+
+.tool-select {
+  background: #26302d;
+}
+
+.tool-erase {
+  background: #52302d;
+}
+
+.cell-markers {
+  position: absolute;
+  inset: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 2px;
+  pointer-events: none;
+}
+
+.cell-marker {
+  width: clamp(15px, 45%, 22px);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.62);
+  border-radius: 50%;
+  color: #10110d;
+  font-size: clamp(0.58rem, 1.3vw, 0.72rem);
+  font-weight: 900;
+  line-height: 1;
+}
+
+.is-selected-marker {
+  box-shadow: 0 0 0 2px var(--focus);
+}
+
+.marker-player {
+  background: #ffe066;
+}
+
+.marker-enemy {
+  background: #d95b57;
+}
+
+.marker-enemy-alt {
+  background: #ee8756;
+}
+
+.marker-decor {
+  background: #7ecb92;
+}
+
+.marker-red-key {
+  background: #ff6b6b;
+}
+
+.marker-green-key {
+  background: #65d67b;
+}
+
+#selection-panel,
+#player-panel,
+#entity-list {
+  display: grid;
+  gap: 10px;
+}
+
+.field-row {
+  grid-template-columns: minmax(72px, 0.5fr) minmax(0, 1fr);
+  align-items: center;
+}
+
+.summary-line,
+.muted-text,
+.status-line {
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.summary-line {
+  margin-bottom: 2px;
+}
+
+.entity-list-item {
+  width: 100%;
+  min-height: 36px;
+  padding: 8px 10px;
+  background: #151711;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+.entity-list-item.is-active {
+  border-color: var(--focus);
+  background: #292516;
+}
+
+.status-line {
+  margin: auto 0 0;
+  min-height: 22px;
+}
+
+@media (max-width: 1050px) {
+  .editor-shell {
+    grid-template-columns: 220px minmax(360px, 1fr);
+  }
+
+  .inspector-panel {
+    grid-column: 1 / -1;
+    border-top: 1px solid var(--border);
+    border-left: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .status-line {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 760px) {
+  .editor-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .topbar,
+  .topbar-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .palette-panel,
+  .inspector-panel {
+    border: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .inspector-panel {
+    display: flex;
+  }
+
+  .tool-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .map-toolbar label {
+    flex: 1 1 96px;
+  }
+
+  .map-toolbar input {
+    width: 100%;
+  }
+}

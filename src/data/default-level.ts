@@ -6,21 +6,21 @@ import type { LevelDefinition } from '../types.js'
 export const defaultLevel = {
   map: mapMatrix,
   playerStart: {
-    x: 300,
-    y: 300,
+    x: 288,
+    y: 288,
   },
   entities: [
     {
       type: 'enemy',
-      x: 600,
-      y: 450,
+      x: 608,
+      y: 480,
       size: 10,
       asset: ASSET_IDS.sprites.enemyGuard,
     },
     {
       type: 'enemy',
-      x: 200,
-      y: 700,
+      x: 224,
+      y: 672,
       size: 10,
       asset: [
         ASSET_IDS.sprites.enemyWalk1,
@@ -30,8 +30,8 @@ export const defaultLevel = {
     },
     {
       type: 'sprite',
-      x: 600,
-      y: 750,
+      x: 608,
+      y: 736,
       size: 40,
       asset: ASSET_IDS.sprites.decoration,
     },
