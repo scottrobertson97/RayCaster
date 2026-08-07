@@ -1,3 +1,4 @@
+import { HIT_MARKER_DURATION } from '../config/constants.js'
 import { isSolidTileId } from '../data/tile-definitions.js'
 import { pointInsideAABB } from '../math/geometry.js'
 import { worldToTile } from '../math/tile-coordinates.js'
@@ -35,6 +36,7 @@ export function resolveBulletCollisions(state: GameState) {
     for (let j = enemies.length - 1; j >= 0; j--) {
       const enemy = enemies[j]
       if (pointInsideAABB(bullet.point, enemy.min, enemy.max)) {
+        state.ui.hitMarkerTimer = HIT_MARKER_DURATION
         bullets.splice(i, 1)
         enemies.splice(j, 1)
         break

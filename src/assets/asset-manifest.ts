@@ -1,4 +1,12 @@
 import type { AssetRef, WallTextureArray } from '../types.js'
+import bulletPlasmaUrl from './images/bullet-plasma.png'
+import decorationCrystalsUrl from './images/decoration-crystals.png'
+import enemyGuardUrl from './images/enemy-guard.png'
+import enemyWalk1Url from './images/enemy-walk-1.png'
+import enemyWalk2Url from './images/enemy-walk-2.png'
+import enemyWalk3Url from './images/enemy-walk-3.png'
+import wallMetalUrl from './images/wall-metal.png'
+import wallStoneUrl from './images/wall-stone.png'
 
 type AssetManifest = {
   images: Record<string, string>
@@ -43,14 +51,14 @@ const missingAssetSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64
 
 export const assetManifest: AssetManifest = {
   images: {
-    [ASSET_IDS.walls.stone]: 'https://i.imgur.com/7B86fSv.png',
-    [ASSET_IDS.walls.metal]: 'https://i.imgur.com/vSDbzMX.png',
-    [ASSET_IDS.sprites.enemyGuard]: 'https://i.imgur.com/FcIXhVp.png',
-    [ASSET_IDS.sprites.enemyWalk1]: 'https://i.imgur.com/rAFkpSc.png',
-    [ASSET_IDS.sprites.enemyWalk2]: 'https://i.imgur.com/rYCrqax.png',
-    [ASSET_IDS.sprites.enemyWalk3]: 'https://i.imgur.com/p5w5cCU.png',
-    [ASSET_IDS.sprites.decoration]: 'https://i.imgur.com/rgwwS0K.png',
-    [ASSET_IDS.sprites.bullet]: 'https://i.imgur.com/xrYTZhD.png',
+    [ASSET_IDS.walls.stone]: wallStoneUrl,
+    [ASSET_IDS.walls.metal]: wallMetalUrl,
+    [ASSET_IDS.sprites.enemyGuard]: enemyGuardUrl,
+    [ASSET_IDS.sprites.enemyWalk1]: enemyWalk1Url,
+    [ASSET_IDS.sprites.enemyWalk2]: enemyWalk2Url,
+    [ASSET_IDS.sprites.enemyWalk3]: enemyWalk3Url,
+    [ASSET_IDS.sprites.decoration]: decorationCrystalsUrl,
+    [ASSET_IDS.sprites.bullet]: bulletPlasmaUrl,
     [ASSET_IDS.sprites.redKeycard]: svgToDataUrl(redKeycardSvg),
     [ASSET_IDS.sprites.greenKeycard]: svgToDataUrl(greenKeycardSvg),
   },

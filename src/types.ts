@@ -20,6 +20,7 @@ export type LineSegment = {
 
 export type AssetRef = string
 export type KeyType = 'red' | 'green'
+export type GamePhase = 'playing' | 'gameOver'
 export type WallTextureArray = Array<HTMLImageElement | undefined>
 
 export type SpriteMinimapOptions = {
@@ -76,6 +77,12 @@ export type EntityStore = {
 
 export type RuntimeEntities = Omit<EntityStore, 'getEntities'>
 
+export type LevelRuntimeData = {
+  map: GameMap
+  player: Player
+  entities: RuntimeEntities
+}
+
 export type GameState = {
   world: {
     map: GameMap
@@ -95,6 +102,8 @@ export type GameState = {
       text: string
       timer: number
     }
+    damageFlashTimer: number
+    hitMarkerTimer: number
     fpsCounterBuffer: number
     fpsLast: number
   }
@@ -128,6 +137,8 @@ export type GameState = {
   runtime: {
     lastTime: number
     dt: number
+    phase: GamePhase
+    restartRequested: boolean
   }
 }
 
@@ -225,6 +236,7 @@ export type RaycasterGameOptions = {
   keyboard: Keyboard
   walls: WallTextureArray
   entities?: Partial<RuntimeEntities>
+  resetLevel?: () => LevelRuntimeData
   controlsRoot?: Document
 }
 

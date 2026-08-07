@@ -1,10 +1,19 @@
-import { defaultRenderSystems, defaultUpdateSystems } from './default-systems.js'
+import {
+  defaultAlwaysUpdateSystems,
+  defaultRenderSystems,
+  defaultUpdateSystems,
+} from './default-systems.js'
 import { GameRuntime } from './game-runtime.js'
 import { GameMap } from '../map/game-map.js'
 import { createGameState } from '../state/game-state.js'
 import { initializeDoorsFromMap } from '../systems/door-system.js'
 import { bindControls } from '../ui/controls.js'
-import type { GameState, RaycasterGameOptions, RuntimeEntities } from '../types.js'
+import type {
+  GameState,
+  LevelRuntimeData,
+  RaycasterGameOptions,
+  RuntimeEntities,
+} from '../types.js'
 
 export function createRaycasterGame({
   viewCanvas,
@@ -14,6 +23,7 @@ export function createRaycasterGame({
   keyboard,
   walls,
   entities = {},
+  resetLevel,
   controlsRoot = document,
 }: RaycasterGameOptions) {
   const ctx = viewCanvas.getContext('2d')
@@ -40,9 +50,45 @@ export function createRaycasterGame({
 
   return new GameRuntime({
     state,
+    alwaysUpdateSystems: defaultAlwaysUpdateSystems,
     updateSystems: defaultUpdateSystems,
     renderSystems: defaultRenderSystems,
+    resetState: resetLevel
+      ? currentState => resetRaycasterState(currentState, resetLevel())
+      : undefined,
   })
+}
+
+function resetRaycasterState(state: GameState, level: LevelRuntimeData) {
+  state.world.map = level.map
+  state.world.player = level.player
+  state.world.doors = {}
+  state.world.inventory = {
+    hasRedKeycard: false,
+    hasGreenKeycard: false,
+  }
+
+  state.entities.enemies.length = 0
+  state.entities.bullets.length = 0
+  state.entities.pickups.length = 0
+  state.entities.sprites.length = 0
+  seedEntities(state, level.entities)
+
+  state.ui.notice.text = ''
+  state.ui.notice.timer = 0
+  state.ui.damageFlashTimer = 0
+  state.ui.hitMarkerTimer = 0
+  state.ui.fpsCounterBuffer = 0
+  state.ui.fpsLast = 0
+  state.render.rays = []
+
+  state.runtime.phase = 'playing'
+  state.runtime.restartRequested = false
+  state.runtime.dt = 0
+  state.runtime.lastTime = performance.now()
+
+  setupCanvas(state)
+  initializeDoorsFromMap(state)
 }
 
 function setupCanvas(state: GameState) {

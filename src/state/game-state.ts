@@ -18,7 +18,7 @@ export function createGameState({
     pickups: [],
     sprites: [],
     getEntities() {
-      return this.enemies.concat(this.bullets, this.pickups, this.sprites)
+      return [...this.enemies, ...this.bullets, ...this.pickups, ...this.sprites]
     },
   }
 
@@ -45,6 +45,8 @@ export function createGameState({
         text: '',
         timer: 0,
       },
+      damageFlashTimer: 0,
+      hitMarkerTimer: 0,
       fpsCounterBuffer: 0,
       fpsLast: 0,
     },
@@ -87,6 +89,8 @@ export function createGameState({
     runtime: {
       lastTime: 0,
       dt: 0,
+      phase: 'playing',
+      restartRequested: false,
     },
   }
 }

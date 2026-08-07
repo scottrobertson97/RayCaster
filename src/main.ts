@@ -12,7 +12,8 @@ function init() {
   if (!(viewCanvas instanceof HTMLCanvasElement) || !(mapCanvas instanceof HTMLCanvasElement)) {
     throw new Error('RayCaster requires #view and #map canvas elements')
   }
-  const level = createLevelRuntimeData(defaultLevel)
+  const resetLevel = () => createLevelRuntimeData(defaultLevel)
+  const level = resetLevel()
 
   const game = createRaycasterGame({
     viewCanvas,
@@ -22,6 +23,7 @@ function init() {
     keyboard: new Keyboard(),
     walls,
     entities: level.entities,
+    resetLevel,
     controlsRoot: document,
   })
 

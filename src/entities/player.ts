@@ -1,5 +1,10 @@
 import { ASSET_IDS } from '../assets/asset-manifest.js'
-import { LOOK_PITCH_MAX_RAD, LOOK_PITCH_SPEED } from '../config/constants.js'
+import {
+  LOOK_PITCH_MAX_RAD,
+  LOOK_PITCH_SPEED,
+  PLAYER_HIT_COOLDOWN,
+  PLAYER_MAX_HEALTH,
+} from '../config/constants.js'
 import { isSolidTileId } from '../data/tile-definitions.js'
 import { worldToTile } from '../math/tile-coordinates.js'
 import { Bullet } from './bullet.js'
@@ -15,6 +20,9 @@ export class Player extends WorldObject {
   lookSpeed: number
   dx: number
   dy: number
+  maxHealth: number
+  health: number
+  hitCooldownRemaining: number
 
   constructor(x = 0, y = 0, a = 0, speed = 200, lookSpeed = 2) {
     super(x, y)
@@ -24,13 +32,31 @@ export class Player extends WorldObject {
     this.lookSpeed = lookSpeed
     this.dx = Math.cos(this.a) * this.speed * (1 / 60)
     this.dy = Math.sin(this.a) * this.speed * (1 / 60)
+    this.maxHealth = PLAYER_MAX_HEALTH
+    this.health = this.maxHealth
+    this.hitCooldownRemaining = 0
   }
 
   update(dt: number, kb: Keyboard, map: GameMap, spawnBullet: (bullet: Bullet) => void) {
+    this.hitCooldownRemaining = Math.max(0, this.hitCooldownRemaining - dt)
     this.turn(dt, kb)
     this.look(dt, kb)
     this.move(dt, kb, map)
     this.shoot(kb, spawnBullet)
+  }
+
+  get isAlive() {
+    return this.health > 0
+  }
+
+  takeDamage(amount: number) {
+    if (!this.isAlive || this.hitCooldownRemaining > 0 || amount <= 0) {
+      return false
+    }
+
+    this.health = Math.max(0, this.health - amount)
+    this.hitCooldownRemaining = PLAYER_HIT_COOLDOWN
+    return true
   }
 
   turn(dt: number, kb: Keyboard) {

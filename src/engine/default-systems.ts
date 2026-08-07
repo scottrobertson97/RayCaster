@@ -4,9 +4,14 @@ import { updateBullets } from '../systems/bullet-system.js'
 import { resolveBulletCollisions } from '../systems/collision-system.js'
 import { handleDoorActivation, updateDoors } from '../systems/door-system.js'
 import { updateEnemies } from '../systems/enemy-system.js'
+import { updateGameSession } from '../systems/game-session-system.js'
 import { updateKeycardPickups } from '../systems/keycard-system.js'
 import { updatePlayer } from '../systems/player-system.js'
 import type { GameState, System } from '../types.js'
+
+export const defaultAlwaysUpdateSystems: System[] = [
+  { name: 'gameSession', run: updateGameSession },
+]
 
 export const defaultUpdateSystems: System[] = [
   { name: 'player', run: updatePlayer },

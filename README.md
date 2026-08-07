@@ -10,7 +10,8 @@ The project is currently both a playable raycasting prototype and the starting p
 - WASD and arrow-key movement/turning.
 - Basic vertical look with keyboard pitch controls.
 - Bullet spawning, movement, wall impact despawn, and enemy hit removal.
-- Enemy chase behavior with simple wall collision.
+- Enemy chase and melee attacks with tuned movement, range, and damage cooldowns.
+- Player health, damage feedback, game over, and in-place restart.
 - Doors, locked red doors, and red keycard pickup flow.
 - Optional 2D map overlay with player, rays, entities, and map tiles.
 - Quality controls that change horizontal ray/render resolution.
@@ -26,6 +27,7 @@ The project is currently both a playable raycasting prototype and the starting p
 - `F`: Look down.
 - `Space`: Fire.
 - `E`: Interact with doors.
+- `Enter`: Restart after game over.
 - `Toggle 2D map`: Show or hide the minimap/debug overlay.
 - Quality radio buttons: Change horizontal render resolution.
 
@@ -97,10 +99,12 @@ After gameplay changes:
 2. Verify movement with WASD and arrow keys.
 3. Verify turning, wall collisions, and no map-edge crash.
 4. Press `Space` and verify bullets spawn and despawn on impact.
-5. Verify enemies chase and are removed when hit by bullets.
-6. Pick up the red keycard and verify locked-door interaction.
-7. Toggle the 2D map and verify overlays still render.
-8. Switch quality radio options and verify horizontal resolution changes.
+5. Verify enemies chase, stop in melee range, damage health, and show a red hit flash.
+6. Hit an enemy and verify the white hit marker appears.
+7. Let health reach zero, verify gameplay freezes, then press `Enter` and verify a fresh level starts.
+8. Pick up the red keycard and verify locked-door interaction.
+9. Toggle the 2D map and verify overlays still render.
+10. Switch quality radio options and verify horizontal resolution changes.
 
 Documentation-only changes do not require a gameplay smoke test.
 

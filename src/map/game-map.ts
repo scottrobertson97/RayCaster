@@ -12,8 +12,10 @@ export class GameMap extends Array<number[]> {
   img: ImageData | null
 
   constructor(m: number[][]) {
-    super(...m)
-    this.width = this[0].length
+    // A runtime map owns its rows because doors mutate tiles while they animate.
+    // Sharing level-definition rows would leak opened doors into later restarts.
+    super(...m.map(row => [...row]))
+    this.width = this[0]?.length ?? 0
     this.height = this.length
     this.img = null
   }

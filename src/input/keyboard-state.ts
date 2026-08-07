@@ -4,22 +4,32 @@ export type ActionMap = Record<KeyboardAction, number[]>
 export class Keyboard {
   keydown: boolean[]
   previousKeydown: boolean[]
+  pressedSinceSnapshot: boolean[]
+  releasedSinceSnapshot: boolean[]
   logKeystrokes: boolean
   actionMap: ActionMap
 
   constructor(logKeystrokes = false, actionMap: ActionMap = DEFAULT_ACTION_MAP) {
     this.keydown = []
     this.previousKeydown = []
+    this.pressedSinceSnapshot = []
+    this.releasedSinceSnapshot = []
     this.logKeystrokes = logKeystrokes
     this.actionMap = actionMap
 
     window.addEventListener('keydown', e => {
       if (logKeystrokes) console.log('keydown=' + e.keyCode)
+      if (!this.keydown[e.keyCode]) {
+        this.pressedSinceSnapshot[e.keyCode] = true
+      }
       this.keydown[e.keyCode] = true
     })
 
     window.addEventListener('keyup', e => {
       if (logKeystrokes) console.log('keyup=' + e.keyCode)
+      if (this.keydown[e.keyCode]) {
+        this.releasedSinceSnapshot[e.keyCode] = true
+      }
       this.keydown[e.keyCode] = false
     })
   }
@@ -30,13 +40,17 @@ export class Keyboard {
 
   actionPressed(action: KeyboardAction) {
     return this.getActionKeys(action).some(
-      keyCode => this.keydown[keyCode] && !this.previousKeydown[keyCode]
+      keyCode =>
+        this.pressedSinceSnapshot[keyCode] ||
+        (this.keydown[keyCode] && !this.previousKeydown[keyCode])
     )
   }
 
   actionReleased(action: KeyboardAction) {
     return this.getActionKeys(action).some(
-      keyCode => !this.keydown[keyCode] && this.previousKeydown[keyCode]
+      keyCode =>
+        this.releasedSinceSnapshot[keyCode] ||
+        (!this.keydown[keyCode] && this.previousKeydown[keyCode])
     )
   }
 
@@ -79,6 +93,8 @@ export class Keyboard {
 
   snapshot() {
     this.previousKeydown = this.keydown.slice()
+    this.pressedSinceSnapshot = []
+    this.releasedSinceSnapshot = []
   }
 
   static KEYBOARD = {
@@ -95,6 +111,7 @@ export class Keyboard {
     KEY_E: 69,
     KEY_R: 82,
     KEY_F: 70,
+    KEY_ENTER: 13,
   }
 
   static ACTIONS = {
@@ -106,6 +123,7 @@ export class Keyboard {
     LOOK_DOWN: 'lookDown',
     FIRE: 'fire',
     INTERACT: 'interact',
+    RESTART: 'restart',
   }
 }
 
@@ -118,4 +136,5 @@ export const DEFAULT_ACTION_MAP = {
   [Keyboard.ACTIONS.LOOK_DOWN]: [Keyboard.KEYBOARD.KEY_F],
   [Keyboard.ACTIONS.FIRE]: [Keyboard.KEYBOARD.KEY_SPACE],
   [Keyboard.ACTIONS.INTERACT]: [Keyboard.KEYBOARD.KEY_E],
+  [Keyboard.ACTIONS.RESTART]: [Keyboard.KEYBOARD.KEY_ENTER],
 }

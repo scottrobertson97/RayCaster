@@ -3,21 +3,33 @@ import type { GameState, System } from '../types.js'
 
 type GameRuntimeOptions = {
   state: GameState
+  alwaysUpdateSystems?: System[]
   updateSystems?: System[]
   renderSystems?: System[]
+  resetState?: (state: GameState) => void
 }
 
 export class GameRuntime {
   state: GameState
+  alwaysUpdateSystems: System[]
   updateSystems: System[]
   renderSystems: System[]
+  resetState: ((state: GameState) => void) | undefined
   running: boolean
   frameRequest: number | null
 
-  constructor({ state, updateSystems = [], renderSystems = [] }: GameRuntimeOptions) {
+  constructor({
+    state,
+    alwaysUpdateSystems = [],
+    updateSystems = [],
+    renderSystems = [],
+    resetState,
+  }: GameRuntimeOptions) {
     this.state = state
+    this.alwaysUpdateSystems = alwaysUpdateSystems
     this.updateSystems = updateSystems
     this.renderSystems = renderSystems
+    this.resetState = resetState
     this.running = false
     this.frameRequest = null
   }
@@ -25,6 +37,7 @@ export class GameRuntime {
   start() {
     if (this.running) return
 
+    this.state.runtime.lastTime = performance.now()
     this.running = true
     this.frame()
   }
@@ -39,7 +52,17 @@ export class GameRuntime {
   }
 
   update() {
+    runSystems(this.alwaysUpdateSystems, this.state)
+    if (this.state.runtime.phase !== 'playing') return
     runSystems(this.updateSystems, this.state)
+  }
+
+  restart() {
+    this.state.runtime.restartRequested = false
+    if (!this.resetState) return false
+
+    this.resetState(this.state)
+    return true
   }
 
   render() {
@@ -51,6 +74,9 @@ export class GameRuntime {
 
     this.state.runtime.dt = calculateDeltaTime(this.state)
     this.update()
+    if (this.state.runtime.restartRequested) {
+      this.restart()
+    }
     this.render()
     this.state.input.keyboard.snapshot()
 

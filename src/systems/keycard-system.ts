@@ -1,7 +1,7 @@
 import { KEY_GREEN, KEY_RED } from '../config/constants.js'
 import type { Pickup } from '../entities/pickup.js'
 import { GameMap } from '../map/game-map.js'
-import { setUiNotice, updateUiNotice } from '../ui/notice-state.js'
+import { setUiNotice } from '../ui/notice-state.js'
 import type { GameState } from '../types.js'
 
 const PICKUP_RADIUS = GameMap.size * 0.35
@@ -23,8 +23,6 @@ function collectPickup(state: GameState, pickup: Pickup) {
 }
 
 export function updateKeycardPickups(state: GameState) {
-  updateUiNotice(state)
-
   for (let i = state.entities.pickups.length - 1; i >= 0; i--) {
     const pickup = state.entities.pickups[i]
     if (pickup.collected) {
